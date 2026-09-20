@@ -279,7 +279,17 @@ public class Modules extends System<Modules> {
     private void onAction(boolean isKey, int value, int modifiers, boolean isPress) {
         if (mc.gui.screen() != null || Input.isKeyPressed(InputConstants.KEY_F3)) return;
 
+        boolean moddedBindMatched = false;
         for (Module module : moduleInstances.values()) {
+            if (module.keybind.hasMods() && module.keybind.matches(isKey, value, modifiers)) {
+                moddedBindMatched = true;
+                break;
+            }
+        }
+
+        for (Module module : moduleInstances.values()) {
+            if (!module.keybind.hasMods() && moddedBindMatched) continue;
+
             if (module.keybind.matches(isKey, value, modifiers) && (isPress || (module.toggleOnBindRelease && module.isActive()))) {
                 module.toggle();
                 module.sendToggledMsg();
