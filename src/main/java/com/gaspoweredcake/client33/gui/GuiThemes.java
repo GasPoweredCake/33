@@ -46,7 +46,7 @@ public class GuiThemes {
             }
         }
 
-        if (theme == null) select("Client33");
+        if (theme == null) select("33");
     }
 
     public static void add(GuiTheme theme) {
