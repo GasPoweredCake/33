@@ -13,11 +13,11 @@ base {
 
 repositories {
     maven {
-        name = "meteor-maven"
+        name = "upstream-maven"
         url = uri("https://maven.meteordev.org/releases")
     }
     maven {
-        name = "meteor-maven-snapshots"
+        name = "upstream-maven-snapshots"
         url = uri("https://maven.meteordev.org/snapshots")
     }
     maven {
@@ -145,7 +145,7 @@ afterEvaluate {
 }
 
 loom {
-    accessWidenerPath = file("src/main/resources/meteor-client.accesswidener")
+    accessWidenerPath = file("src/main/resources/client33.accesswidener")
 }
 
 tasks {
@@ -185,7 +185,7 @@ tasks {
         from(sourceSets["launcher"].output)
 
         manifest {
-            attributes["Main-Class"] = "meteordevelopment.meteorclient.Main"
+            attributes["Main-Class"] = "com.gaspoweredcake.client33.Main"
         }
     }
 
@@ -217,24 +217,10 @@ publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             from(components["java"])
-            artifactId = "meteor-client"
+            artifactId = "client33"
 
             version = "${libs.versions.minecraft.get()}-SNAPSHOT"
         }
     }
 
-    repositories {
-        maven("https://maven.meteordev.org/snapshots") {
-            name = "meteor-maven"
-
-            credentials {
-                username = System.getenv("MAVEN_METEOR_ALIAS")
-                password = System.getenv("MAVEN_METEOR_TOKEN")
-            }
-
-            authentication {
-                create<BasicAuthentication>("basic")
-            }
-        }
-    }
 }

@@ -1,5 +1,5 @@
 name: Crash
-description: Report a crash to help us improve Meteor.
+description: Report a crash to help us improve Client33.
 labels: [ crash ]
 body:
   - type: textarea
@@ -20,10 +20,10 @@ body:
     validations:
         required: true
   - type: input
-    id: meteor-version
+    id: client33-version
     attributes:
-      label: Meteor Version
-      placeholder: Meteor X.Y.Z (or X.Y.Z-build_number)
+      label: Client33 Version
+      placeholder: Client33 X.Y.Z (or X.Y.Z-build_number)
     validations:
       required: true
   - type: input

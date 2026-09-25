@@ -1,0 +1,38 @@
+/*
+ * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+ * Copyright (c) Meteor Development.
+ */
+
+package com.gaspoweredcake.client33.systems.modules.player;
+
+import com.gaspoweredcake.client33.events.world.TickEvent;
+import com.gaspoweredcake.client33.systems.modules.Categories;
+import com.gaspoweredcake.client33.systems.modules.Module;
+import com.gaspoweredcake.client33.utils.player.FindItemResult;
+import com.gaspoweredcake.client33.utils.player.InvUtils;
+import com.gaspoweredcake.client33.utils.player.Rotations;
+import meteordevelopment.orbit.EventHandler;
+import net.minecraft.item.Items;
+
+public class EXPThrower extends Module {
+    public EXPThrower() {
+        super(Categories.Player, "exp-thrower", "Automatically throws XP bottles from your hotbar.");
+    }
+
+    @EventHandler
+    private void onTick(TickEvent.Pre event) {
+        FindItemResult exp = InvUtils.findInHotbar(Items.EXPERIENCE_BOTTLE);
+        if (!exp.found()) return;
+
+        Rotations.rotate(mc.player.getYaw(), 90, () -> {
+            if (exp.getHand() != null) {
+                mc.interactionManager.interactItem(mc.player, exp.getHand());
+            }
+            else {
+                InvUtils.swap(exp.slot(), true);
+                mc.interactionManager.interactItem(mc.player, exp.getHand());
+                InvUtils.swapBack();
+            }
+        });
+    }
+}

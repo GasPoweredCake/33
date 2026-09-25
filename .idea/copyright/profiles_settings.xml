@@ -1,7 +1,7 @@
 <component name="CopyrightManager">
-  <settings default="Meteor">
+  <settings default="Client33">
     <module2copyright>
-      <element module="Meteor Copyright Notice" copyright="Meteor" />
+      <element module="Client33 Copyright Notice" copyright="Client33" />
     </module2copyright>
   </settings>
 </component>
