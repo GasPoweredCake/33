@@ -15,7 +15,7 @@ import com.gaspoweredcake.client33.systems.modules.Categories;
 import com.gaspoweredcake.client33.systems.modules.Module;
 import com.gaspoweredcake.client33.utils.player.ChatUtils;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 
 public class MessageAura extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -23,7 +23,7 @@ public class MessageAura extends Module {
     private final Setting<String> message = sgGeneral.add(new StringSetting.Builder()
         .name("message")
         .description("The specified message sent to the player.")
-        .defaultValue("33")
+        .defaultValue("Client33 on Crack!")
         .build()
     );
 
@@ -40,9 +40,9 @@ public class MessageAura extends Module {
 
     @EventHandler
     private void onEntityAdded(EntityAddedEvent event) {
-        if (!(event.entity instanceof PlayerEntity) || event.entity.getUuid().equals(mc.player.getUuid())) return;
+        if (!(event.entity instanceof Player) || event.entity.getUUID().equals(mc.player.getUUID())) return;
 
-        if (!ignoreFriends.get() || (ignoreFriends.get() && !Friends.get().isFriend((PlayerEntity)event.entity))) {
+        if (!ignoreFriends.get() || (ignoreFriends.get() && !Friends.get().isFriend((Player) event.entity))) {
             ChatUtils.sendPlayerMsg("/msg " + event.entity.getName().getString() + " " + message.get());
         }
     }

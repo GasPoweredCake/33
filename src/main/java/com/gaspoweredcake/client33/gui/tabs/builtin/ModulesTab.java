@@ -9,7 +9,7 @@ import com.gaspoweredcake.client33.gui.GuiTheme;
 import com.gaspoweredcake.client33.gui.GuiThemes;
 import com.gaspoweredcake.client33.gui.tabs.Tab;
 import com.gaspoweredcake.client33.gui.tabs.TabScreen;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.Screen;
 
 public class ModulesTab extends Tab {
     public ModulesTab() {

@@ -10,8 +10,8 @@ import com.gaspoweredcake.client33.gui.WindowScreen;
 import com.gaspoweredcake.client33.renderer.ShapeMode;
 import com.gaspoweredcake.client33.settings.*;
 import com.gaspoweredcake.client33.utils.render.color.SettingColor;
-import net.minecraft.block.Block;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.world.level.block.Block;
+import org.jspecify.annotations.Nullable;
 
 public class ESPBlockDataScreen extends WindowScreen {
     private final ESPBlockData blockData;
@@ -57,7 +57,7 @@ public class ESPBlockDataScreen extends WindowScreen {
         sgGeneral.add(new ColorSetting.Builder()
             .name("line-color")
             .description("Color of lines.")
-            .defaultValue(new SettingColor(103, 224, 181))
+            .defaultValue(new SettingColor(0, 255, 200))
             .onModuleActivated(settingColorSetting -> settingColorSetting.get().set(blockData.lineColor))
             .onChanged(settingColor -> {
                 if (!blockData.lineColor.equals(settingColor)) {
@@ -71,7 +71,7 @@ public class ESPBlockDataScreen extends WindowScreen {
         sgGeneral.add(new ColorSetting.Builder()
             .name("side-color")
             .description("Color of sides.")
-            .defaultValue(new SettingColor(103, 224, 181, 25))
+            .defaultValue(new SettingColor(0, 255, 200, 25))
             .onModuleActivated(settingColorSetting -> settingColorSetting.get().set(blockData.sideColor))
             .onChanged(settingColor -> {
                 if (!blockData.sideColor.equals(settingColor)) {
@@ -99,7 +99,7 @@ public class ESPBlockDataScreen extends WindowScreen {
         sgTracer.add(new ColorSetting.Builder()
             .name("tracer-color")
             .description("Color of tracer line.")
-            .defaultValue(new SettingColor(103, 224, 181, 125))
+            .defaultValue(new SettingColor(0, 255, 200, 125))
             .onModuleActivated(settingColorSetting -> settingColorSetting.get().set(blockData.tracerColor))
             .onChanged(settingColor -> {
                 if (!blockData.tracerColor.equals(settingColor)) {

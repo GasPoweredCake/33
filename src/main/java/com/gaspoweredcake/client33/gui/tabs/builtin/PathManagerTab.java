@@ -11,7 +11,7 @@ import com.gaspoweredcake.client33.gui.tabs.TabScreen;
 import com.gaspoweredcake.client33.gui.tabs.WindowTabScreen;
 import com.gaspoweredcake.client33.gui.widgets.input.WTextBox;
 import com.gaspoweredcake.client33.pathing.PathManagers;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.Screen;
 
 public class PathManagerTab extends Tab {
     public PathManagerTab() {

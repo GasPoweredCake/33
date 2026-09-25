@@ -9,7 +9,7 @@ import com.gaspoweredcake.client33.events.render.Render3DEvent;
 import com.gaspoweredcake.client33.renderer.ShapeMode;
 import com.gaspoweredcake.client33.settings.*;
 import com.gaspoweredcake.client33.utils.render.color.SettingColor;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 // TODO: Add outline and more modes
 public class CuboidMarker extends BaseMarker {

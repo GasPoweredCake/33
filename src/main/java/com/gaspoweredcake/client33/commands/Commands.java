@@ -13,9 +13,9 @@ import com.gaspoweredcake.client33.events.game.GameJoinedEvent;
 import com.gaspoweredcake.client33.pathing.PathManagers;
 import com.gaspoweredcake.client33.utils.PostInit;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.command.CommandRegistryAccess;
-import net.minecraft.command.CommandSource;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.client.multiplayer.ClientSuggestionProvider;
+import net.minecraft.commands.CommandBuildContext;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -25,7 +25,7 @@ import static com.gaspoweredcake.client33.Client33.mc;
 
 public class Commands {
     public static final List<Command> COMMANDS = new ArrayList<>();
-    public static CommandDispatcher<CommandSource> DISPATCHER = new CommandDispatcher<>();
+    public static CommandDispatcher<ClientSuggestionProvider> DISPATCHER = new CommandDispatcher<>();
 
     @PostInit(dependencies = PathManagers.class)
     public static void init() {
@@ -80,7 +80,7 @@ public class Commands {
     }
 
     public static void dispatch(String message) throws CommandSyntaxException {
-        DISPATCHER.execute(message, mc.getNetworkHandler().getCommandSource());
+        DISPATCHER.execute(message, mc.getConnection().getSuggestionsProvider());
     }
 
     public static Command get(String name) {
@@ -94,8 +94,8 @@ public class Commands {
     }
 
     /**
-     * Argument types that rely on Minecraft registries access those registries through a {@link CommandRegistryAccess}
-     * object. Since dynamic registries are specific to each server, we need to make a new CommandRegistryAccess object
+     * Argument types that rely on Minecraft registries access those registries through a {@link CommandBuildContext}
+     * object. Since dynamic registries are specific to each server, we need to make a new CommandBuildContext object
      * every time we join a server.
      * <p>
      * The command tree and by extension the {@link CommandDispatcher} also have to be rebuilt because:
@@ -112,8 +112,8 @@ public class Commands {
      */
     @EventHandler
     private static void onJoin(GameJoinedEvent event) {
-        ClientPlayNetworkHandler networkHandler = mc.getNetworkHandler();
-        Command.REGISTRY_ACCESS = CommandRegistryAccess.of(networkHandler.getRegistryManager(), networkHandler.getEnabledFeatures());
+        ClientPacketListener networkHandler = mc.getConnection();
+        Command.REGISTRY_ACCESS = CommandBuildContext.simple(networkHandler.registryAccess(), networkHandler.enabledFeatures());
 
         DISPATCHER = new CommandDispatcher<>();
         for (Command command : COMMANDS) {

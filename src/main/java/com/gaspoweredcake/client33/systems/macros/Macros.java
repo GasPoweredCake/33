@@ -6,7 +6,7 @@
 package com.gaspoweredcake.client33.systems.macros;
 
 import com.gaspoweredcake.client33.Client33;
-import com.gaspoweredcake.client33.events.client33.KeyEvent;
+import com.gaspoweredcake.client33.events.client33.KeyInputEvent;
 import com.gaspoweredcake.client33.events.client33.MouseClickEvent;
 import com.gaspoweredcake.client33.systems.System;
 import com.gaspoweredcake.client33.systems.Systems;
@@ -14,8 +14,8 @@ import com.gaspoweredcake.client33.utils.misc.NbtUtils;
 import com.gaspoweredcake.client33.utils.misc.input.KeyAction;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
-import net.minecraft.nbt.NbtCompound;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.nbt.CompoundTag;
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -58,7 +58,7 @@ public class Macros extends System<Macros> implements Iterable<Macro> {
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    private void onKey(KeyEvent event) {
+    private void onKey(KeyInputEvent event) {
         if (event.action == KeyAction.Release) return;
 
         for (Macro macro : macros) {
@@ -80,19 +80,19 @@ public class Macros extends System<Macros> implements Iterable<Macro> {
     }
 
     @Override
-    public @NotNull Iterator<Macro> iterator() {
+    public @NonNull Iterator<Macro> iterator() {
         return macros.iterator();
     }
 
     @Override
-    public NbtCompound toTag() {
-        NbtCompound tag = new NbtCompound();
+    public CompoundTag toTag() {
+        CompoundTag tag = new CompoundTag();
         tag.put("macros", NbtUtils.listToTag(macros));
         return tag;
     }
 
     @Override
-    public Macros fromTag(NbtCompound tag) {
+    public Macros fromTag(CompoundTag tag) {
         for (Macro macro : macros) Client33.EVENT_BUS.unsubscribe(macro);
 
         macros = NbtUtils.listFromTag(tag.getListOrEmpty("macros"), Macro::new);

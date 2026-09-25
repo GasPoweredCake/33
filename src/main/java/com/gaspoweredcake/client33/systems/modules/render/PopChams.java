@@ -7,7 +7,7 @@ package com.gaspoweredcake.client33.systems.modules.render;
 
 import com.gaspoweredcake.client33.events.packets.PacketEvent;
 import com.gaspoweredcake.client33.events.render.Render3DEvent;
-import com.gaspoweredcake.client33.mixininterface.IVec3d;
+import com.gaspoweredcake.client33.mixininterface.IVec3;
 import com.gaspoweredcake.client33.renderer.ShapeMode;
 import com.gaspoweredcake.client33.settings.*;
 import com.gaspoweredcake.client33.systems.modules.Categories;
@@ -16,10 +16,10 @@ import com.gaspoweredcake.client33.utils.entity.fakeplayer.FakePlayerEntity;
 import com.gaspoweredcake.client33.utils.render.WireframeEntityRenderer;
 import com.gaspoweredcake.client33.utils.render.color.SettingColor;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityStatuses;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
+import net.minecraft.network.protocol.game.ClientboundEntityEventPacket;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityEvent;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,14 +77,14 @@ public class PopChams extends Module {
     private final Setting<SettingColor> sideColor = sgGeneral.add(new ColorSetting.Builder()
         .name("side-color")
         .description("The side color.")
-        .defaultValue(new SettingColor(242, 238, 255, 25))
+        .defaultValue(new SettingColor(255, 255, 255, 25))
         .build()
     );
 
     private final Setting<SettingColor> lineColor = sgGeneral.add(new ColorSetting.Builder()
         .name("line-color")
         .description("The line color.")
-        .defaultValue(new SettingColor(242, 238, 255, 127))
+        .defaultValue(new SettingColor(255, 255, 255, 127))
         .build()
     );
 
@@ -103,14 +103,14 @@ public class PopChams extends Module {
 
     @EventHandler
     private void onReceivePacket(PacketEvent.Receive event) {
-        if (!(event.packet instanceof EntityStatusS2CPacket p)) return;
-        if (p.getStatus() != EntityStatuses.USE_TOTEM_OF_UNDYING) return;
+        if (!(event.packet instanceof ClientboundEntityEventPacket p)) return;
+        if (p.getEventId() != EntityEvent.PROTECTED_FROM_DEATH) return;
 
-        Entity entity = p.getEntity(mc.world);
-        if (!(entity instanceof PlayerEntity player) || entity == mc.player) return;
+        Entity entity = p.getEntity(mc.level);
+        if (!(entity instanceof Player player) || entity == mc.player) return;
 
         synchronized (ghosts) {
-            if (onlyOne.get()) ghosts.removeIf(ghostPlayer -> ghostPlayer.uuid.equals(entity.getUuid()));
+            if (onlyOne.get()) ghosts.removeIf(ghostPlayer -> ghostPlayer.uuid.equals(entity.getUUID()));
 
             ghosts.add(new GhostPlayer(player));
         }
@@ -127,10 +127,10 @@ public class PopChams extends Module {
         private final UUID uuid;
         private double timer, scale = 1;
 
-        public GhostPlayer(PlayerEntity player) {
+        public GhostPlayer(Player player) {
             super(player, "ghost", 20, false);
 
-            uuid = player.getUuid();
+            uuid = player.getUUID();
         }
 
         public boolean render(Render3DEvent event) {
@@ -139,8 +139,8 @@ public class PopChams extends Module {
             if (timer > renderTime.get()) return true;
 
             // Y Modifier
-            lastRenderY = getY();
-            ((IVec3d) getEntityPos()).client33$setY(getY() + yModifier.get() * event.frameTime);
+            yOld = getY();
+            ((IVec3) position()).client33$setY(getY() + yModifier.get() * event.frameTime);
 
             // Scale Modifier
             scale += scaleModifier.get() * event.frameTime;

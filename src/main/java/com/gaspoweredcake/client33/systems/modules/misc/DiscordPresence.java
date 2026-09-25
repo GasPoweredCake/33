@@ -7,6 +7,7 @@ package com.gaspoweredcake.client33.systems.modules.misc;
 
 //Created by squidoodly
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import meteordevelopment.discordipc.DiscordIPC;
 import meteordevelopment.discordipc.RichPresence;
 import com.gaspoweredcake.client33.Client33;
@@ -23,17 +24,16 @@ import com.gaspoweredcake.client33.systems.modules.Module;
 import com.gaspoweredcake.client33.utils.Utils;
 import com.gaspoweredcake.client33.utils.misc.Client33Starscript;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.gui.screen.CreditsScreen;
-import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.gui.screen.multiplayer.AddServerScreen;
-import net.minecraft.client.gui.screen.multiplayer.ConnectScreen;
-import net.minecraft.client.gui.screen.multiplayer.DirectConnectScreen;
-import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
-import net.minecraft.client.gui.screen.option.*;
-import net.minecraft.client.gui.screen.pack.PackScreen;
-import net.minecraft.client.gui.screen.world.*;
-import net.minecraft.client.realms.gui.screen.RealmsScreen;
-import net.minecraft.util.Pair;
+import net.minecraft.client.gui.screens.*;
+import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
+import net.minecraft.client.gui.screens.options.*;
+import net.minecraft.client.gui.screens.options.controls.ControlsScreen;
+import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
+import net.minecraft.client.gui.screens.worldselection.AbstractGameRulesScreen;
+import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
+import net.minecraft.client.gui.screens.worldselection.EditWorldScreen;
+import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
+import net.minecraft.realms.RealmsScreen;
 import net.minecraft.util.Util;
 import org.meteordev.starscript.Script;
 
@@ -55,7 +55,7 @@ public class DiscordPresence extends Module {
         .name("line-1-messages")
         .description("Messages used for the first line.")
         .defaultValue("{player}", "{server}")
-        .onChanged(strings -> recompileLine1())
+        .onChanged(_ -> recompileLine1())
         .renderer(StarscriptTextBoxRenderer.class)
         .build()
     );
@@ -81,8 +81,8 @@ public class DiscordPresence extends Module {
     private final Setting<List<String>> line2Strings = sgLine2.add(new StringListSetting.Builder()
         .name("line-2-messages")
         .description("Messages used for the second line.")
-        .defaultValue("33", "{round(server.tps, 1)} TPS", "Playing on {server.difficulty} difficulty.", "{server.player_count} Players online")
-        .onChanged(strings -> recompileLine2())
+        .defaultValue("Client33 on Crack!", "{round(server.tps, 1)} TPS", "Playing on {server.difficulty} difficulty.", "{server.player_count} Players online")
+        .onChanged(_ -> recompileLine2())
         .renderer(StarscriptTextBoxRenderer.class)
         .build()
     );
@@ -104,7 +104,8 @@ public class DiscordPresence extends Module {
     );
 
     private static final RichPresence rpc = new RichPresence();
-    private boolean started;
+    private SmallImage currentSmallImage;
+    private int ticks;
     private boolean forceUpdate, lastWasInMainMenu;
 
     private final List<Script> line1Scripts = new ArrayList<>();
@@ -113,7 +114,7 @@ public class DiscordPresence extends Module {
     private final List<Script> line2Scripts = new ArrayList<>();
     private int line2Ticks, line2I;
 
-    public static final List<Pair<String, String>> customStates = new ArrayList<>();
+    public static final Object2ObjectLinkedOpenHashMap<String, String> customStates = new Object2ObjectLinkedOpenHashMap<>();
 
     static {
         registerCustomState("com.terraformersmc.modmenu.gui", "Browsing mods");
@@ -121,50 +122,41 @@ public class DiscordPresence extends Module {
     }
 
     public DiscordPresence() {
-        super(Categories.Misc, "discord-presence", "Displays 33 as your presence on Discord.");
+        super(Categories.Misc, "discord-presence", "Displays Client33 as your presence on Discord.");
 
         runInMainMenu = true;
     }
 
-    /** Registers a custom state to be used when the current screen is a class in the specified package. */
+    /**
+     * Registers a custom state to be used when the current screen is a class in the specified package.
+     */
     public static void registerCustomState(String packageName, String state) {
-        for (var pair : customStates) {
-            if (pair.getLeft().equals(packageName)) {
-                pair.setRight(state);
-                return;
-            }
-        }
-
-        customStates.add(new Pair<>(packageName, state));
+        customStates.put(packageName, state);
     }
 
-    /** The package name must match exactly to the one provided through {@link #registerCustomState(String, String)}. */
+    /**
+     * The package name must match exactly to the one provided through {@link #registerCustomState(String, String)}.
+     */
     public static void unregisterCustomState(String packageName) {
-        customStates.removeIf(pair -> pair.getLeft().equals(packageName));
+        customStates.remove(packageName);
     }
 
     @Override
     public void onActivate() {
-        long applicationId = Long.getLong("client33.discord.applicationId", 0L);
-        if (applicationId <= 0) {
-            error("Set the client33.discord.applicationId Java property to use Discord presence.");
-            disable();
-            return;
-        }
-
-        DiscordIPC.start(applicationId, null);
-        started = true;
+        DiscordIPC.start(835240968533049424L, null);
 
         rpc.setStart(System.currentTimeMillis() / 1000L);
 
         String largeText = "%s %s".formatted(Client33.NAME, Client33.VERSION);
         if (!Client33.BUILD_NUMBER.isEmpty()) largeText += " Build: " + Client33.BUILD_NUMBER;
-        String imageKey = System.getProperty("client33.discord.imageKey");
-        if (imageKey != null && !imageKey.isBlank()) rpc.setLargeImage(imageKey, largeText);
+        rpc.setLargeImage("client33_client", largeText);
+
+        currentSmallImage = SmallImage.Snail;
 
         recompileLine1();
         recompileLine2();
 
+        ticks = 0;
         line1Ticks = 0;
         line2Ticks = 0;
         lastWasInMainMenu = false;
@@ -175,10 +167,7 @@ public class DiscordPresence extends Module {
 
     @Override
     public void onDeactivate() {
-        if (started) {
-            DiscordIPC.stop();
-            started = false;
-        }
+        DiscordIPC.stop();
     }
 
     private void recompile(List<String> messages, List<Script> scripts) {
@@ -203,6 +192,15 @@ public class DiscordPresence extends Module {
     @EventHandler
     private void onTick(TickEvent.Post event) {
         boolean update = false;
+
+        // Image
+        if (ticks >= 200 || forceUpdate) {
+            currentSmallImage = currentSmallImage.next();
+            currentSmallImage.apply();
+            update = true;
+
+            ticks = 0;
+        } else ticks++;
 
         if (Utils.canUpdate()) {
             // Line 1
@@ -238,30 +236,32 @@ public class DiscordPresence extends Module {
 
                 line2Ticks = 0;
             } else line2Ticks++;
-        }
-        else {
+        } else {
             if (!lastWasInMainMenu) {
                 rpc.setDetails(Client33.NAME + " " + (Client33.BUILD_NUMBER.isEmpty() ? Client33.VERSION : Client33.VERSION + " " + Client33.BUILD_NUMBER));
 
-                if (mc.currentScreen instanceof TitleScreen) rpc.setState("Looking at title screen");
-                else if (mc.currentScreen instanceof SelectWorldScreen) rpc.setState("Selecting world");
-                else if (mc.currentScreen instanceof CreateWorldScreen || mc.currentScreen instanceof EditGameRulesScreen) rpc.setState("Creating world");
-                else if (mc.currentScreen instanceof EditWorldScreen) rpc.setState("Editing world");
-                else if (mc.currentScreen instanceof LevelLoadingScreen) rpc.setState("Loading world");
-                else if (mc.currentScreen instanceof MultiplayerScreen) rpc.setState("Selecting server");
-                else if (mc.currentScreen instanceof AddServerScreen) rpc.setState("Adding server");
-                else if (mc.currentScreen instanceof ConnectScreen || mc.currentScreen instanceof DirectConnectScreen) rpc.setState("Connecting to server");
-                else if (mc.currentScreen instanceof WidgetScreen) rpc.setState("Browsing 33 GUI");
-                else if (mc.currentScreen instanceof OptionsScreen || mc.currentScreen instanceof SkinOptionsScreen || mc.currentScreen instanceof SoundOptionsScreen || mc.currentScreen instanceof VideoOptionsScreen || mc.currentScreen instanceof ControlsOptionsScreen || mc.currentScreen instanceof LanguageOptionsScreen || mc.currentScreen instanceof ChatOptionsScreen || mc.currentScreen instanceof PackScreen || mc.currentScreen instanceof AccessibilityOptionsScreen) rpc.setState("Changing options");
-                else if (mc.currentScreen instanceof CreditsScreen) rpc.setState("Reading credits");
-                else if (mc.currentScreen instanceof RealmsScreen) rpc.setState("Browsing Realms");
+                if (mc.gui.screen() instanceof TitleScreen) rpc.setState("Looking at title screen");
+                else if (mc.gui.screen() instanceof SelectWorldScreen) rpc.setState("Selecting world");
+                else if (mc.gui.screen() instanceof CreateWorldScreen || mc.gui.screen() instanceof AbstractGameRulesScreen)
+                    rpc.setState("Creating world");
+                else if (mc.gui.screen() instanceof EditWorldScreen) rpc.setState("Editing world");
+                else if (mc.gui.screen() instanceof LevelLoadingScreen) rpc.setState("Loading world");
+                else if (mc.gui.screen() instanceof JoinMultiplayerScreen) rpc.setState("Selecting server");
+                else if (mc.gui.screen() instanceof ManageServerScreen) rpc.setState("Adding server");
+                else if (mc.gui.screen() instanceof ConnectScreen || mc.gui.screen() instanceof DirectJoinServerScreen)
+                    rpc.setState("Connecting to server");
+                else if (mc.gui.screen() instanceof WidgetScreen) rpc.setState("Browsing Client33's GUI");
+                else if (mc.gui.screen() instanceof OptionsScreen || mc.gui.screen() instanceof SkinCustomizationScreen || mc.gui.screen() instanceof SoundOptionsScreen || mc.gui.screen() instanceof VideoSettingsScreen || mc.gui.screen() instanceof ControlsScreen || mc.gui.screen() instanceof LanguageSelectScreen || mc.gui.screen() instanceof ChatOptionsScreen || mc.gui.screen() instanceof PackSelectionScreen || mc.gui.screen() instanceof AccessibilityOptionsScreen)
+                    rpc.setState("Changing options");
+                else if (mc.gui.screen() instanceof WinScreen) rpc.setState("Reading credits");
+                else if (mc.gui.screen() instanceof RealmsScreen) rpc.setState("Browsing Realms");
                 else {
                     boolean setState = false;
-                    if (mc.currentScreen != null) {
-                        String className = mc.currentScreen.getClass().getName();
-                        for (var pair : customStates) {
-                            if (className.startsWith(pair.getLeft())) {
-                                rpc.setState(pair.getRight());
+                    if (mc.gui.screen() != null) {
+                        String className = mc.gui.screen().getClass().getName();
+                        for (var entry : customStates.object2ObjectEntrySet()) {
+                            if (className.startsWith(entry.getKey())) {
+                                rpc.setState(entry.getValue());
                                 setState = true;
                                 break;
                             }
@@ -287,10 +287,30 @@ public class DiscordPresence extends Module {
 
     @Override
     public WWidget getWidget(GuiTheme theme) {
-        WButton help = theme.button("Open project page.");
-        help.action = () -> Util.getOperatingSystem().open("https://github.com/GasPoweredCake/33");
+        WButton help = theme.button("Open documentation.");
+        help.action = () -> Util.getPlatform().openUri("https://github.com/GasPoweredCake/33");
 
         return help;
     }
 
+    private enum SmallImage {
+        MineGame("minegame", "MineGame159"),
+        Snail("seasnail", "seasnail8169");
+
+        private final String key, text;
+
+        SmallImage(String key, String text) {
+            this.key = key;
+            this.text = text;
+        }
+
+        void apply() {
+            rpc.setSmallImage(key, text);
+        }
+
+        SmallImage next() {
+            if (this == MineGame) return Snail;
+            return MineGame;
+        }
+    }
 }

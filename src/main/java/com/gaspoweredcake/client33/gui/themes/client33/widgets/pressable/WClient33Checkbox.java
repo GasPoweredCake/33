@@ -9,7 +9,7 @@ import com.gaspoweredcake.client33.gui.renderer.GuiRenderer;
 import com.gaspoweredcake.client33.gui.themes.client33.Client33GuiTheme;
 import com.gaspoweredcake.client33.gui.themes.client33.Client33Widget;
 import com.gaspoweredcake.client33.gui.widgets.pressable.WCheckbox;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 
 public class WClient33Checkbox extends WCheckbox implements Client33Widget {
     private double animProgress;
@@ -24,7 +24,7 @@ public class WClient33Checkbox extends WCheckbox implements Client33Widget {
         Client33GuiTheme theme = theme();
 
         animProgress += (checked ? 1 : -1) * delta * 14;
-        animProgress = MathHelper.clamp(animProgress, 0, 1);
+        animProgress = Mth.clamp(animProgress, 0, 1);
 
         renderBackground(renderer, this, pressed, mouseOver);
 

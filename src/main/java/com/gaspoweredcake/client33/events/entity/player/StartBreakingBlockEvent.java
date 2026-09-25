@@ -6,8 +6,8 @@
 package com.gaspoweredcake.client33.events.entity.player;
 
 import com.gaspoweredcake.client33.events.Cancellable;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 
 public class StartBreakingBlockEvent extends Cancellable {
     private static final StartBreakingBlockEvent INSTANCE = new StartBreakingBlockEvent();

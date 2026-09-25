@@ -7,7 +7,7 @@ package com.gaspoweredcake.client33.settings;
 
 import com.gaspoweredcake.client33.gui.utils.CharFilter;
 import com.gaspoweredcake.client33.gui.widgets.input.WTextBox;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.CompoundTag;
 
 import java.util.function.Consumer;
 
@@ -41,15 +41,15 @@ public class StringSetting extends Setting<String> {
     }
 
     @Override
-    public NbtCompound save(NbtCompound tag) {
+    public CompoundTag save(CompoundTag tag) {
         tag.putString("value", get());
 
         return tag;
     }
 
     @Override
-    public String load(NbtCompound tag) {
-        set(tag.getString("value", ""));
+    public String load(CompoundTag tag) {
+        set(tag.getStringOr("value", ""));
 
         return get();
     }

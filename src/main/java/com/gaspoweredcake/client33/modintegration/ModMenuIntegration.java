@@ -13,6 +13,6 @@ import com.gaspoweredcake.client33.gui.screens.ModulesScreen;
 public class ModMenuIntegration implements ModMenuApi {
     @Override
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
-        return screen -> new ModulesScreen(GuiThemes.get());
+        return _ -> new ModulesScreen(GuiThemes.get());
     }
 }

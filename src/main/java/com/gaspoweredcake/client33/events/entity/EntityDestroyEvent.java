@@ -5,7 +5,7 @@
 
 package com.gaspoweredcake.client33.events.entity;
 
-import net.minecraft.entity.Entity;
+import net.minecraft.world.entity.Entity;
 
 public class EntityDestroyEvent {
     private static final EntityDestroyEvent INSTANCE = new EntityDestroyEvent();

@@ -10,7 +10,7 @@ import com.gaspoweredcake.client33.events.render.Render3DEvent;
 import com.gaspoweredcake.client33.systems.modules.Modules;
 import com.gaspoweredcake.client33.utils.misc.UnorderedArrayList;
 import com.gaspoweredcake.client33.utils.render.RenderUtils;
-import net.minecraft.block.Block;
+import net.minecraft.world.level.block.Block;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
@@ -77,7 +77,8 @@ public class ESPGroup {
         remainingBlocks.remove(blocks.getFirst());
         neighbours.remove(blocks.getFirst());
 
-        loop: {
+        loop:
+        {
             while (!blocksToCheck.isEmpty()) {
                 ESPBlock b = blocksToCheck.poll();
 

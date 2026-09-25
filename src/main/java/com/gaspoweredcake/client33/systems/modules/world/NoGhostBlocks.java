@@ -13,7 +13,7 @@ import com.gaspoweredcake.client33.settings.SettingGroup;
 import com.gaspoweredcake.client33.systems.modules.Categories;
 import com.gaspoweredcake.client33.systems.modules.Module;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class NoGhostBlocks extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -38,12 +38,12 @@ public class NoGhostBlocks extends Module {
 
     @EventHandler
     private void onBreakBlock(BreakBlockEvent event) {
-        if (mc.isInSingleplayer() || !breaking.get()) return;
+        if (mc.isLocalServer() || !breaking.get()) return;
 
         event.cancel();
 
-        BlockState blockState = mc.world.getBlockState(event.blockPos);
-        blockState.getBlock().onBreak(mc.world, event.blockPos, blockState, mc.player);
+        BlockState blockState = mc.level.getBlockState(event.blockPos);
+        blockState.getBlock().playerWillDestroy(mc.level, event.blockPos, blockState, mc.player);
     }
 
     @EventHandler

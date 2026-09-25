@@ -13,8 +13,8 @@ import com.gaspoweredcake.client33.renderer.MeshBuilder;
 import com.gaspoweredcake.client33.renderer.MeshRenderer;
 import com.gaspoweredcake.client33.renderer.Client33RenderPipelines;
 import com.gaspoweredcake.client33.utils.render.color.Color;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Click;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.input.MouseButtonEvent;
 
 public class GuiDebugRenderer {
     private static final Color CELL_COLOR = new Color(25, 225, 25);
@@ -30,13 +30,13 @@ public class GuiDebugRenderer {
         mesh.end();
 
         MeshRenderer.begin()
-            .attachments(MinecraftClient.getInstance().getFramebuffer())
+            .attachments(Minecraft.getInstance().gameRenderer.mainRenderTarget())
             .pipeline(Client33RenderPipelines.WORLD_COLORED_LINES)
             .mesh(mesh)
             .end();
     }
 
-    public void mouseReleased(WWidget widget, Click click, int i) {
+    public void mouseReleased(WWidget widget, MouseButtonEvent click, int i) {
         if (widget == null) return;
 
         Client33.LOG.info("{} {}", widget.getClass(), i);

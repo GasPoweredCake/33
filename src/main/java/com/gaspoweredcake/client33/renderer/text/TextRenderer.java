@@ -8,6 +8,7 @@ package com.gaspoweredcake.client33.renderer.text;
 import com.gaspoweredcake.client33.renderer.Fonts;
 import com.gaspoweredcake.client33.systems.config.Config;
 import com.gaspoweredcake.client33.utils.render.color.Color;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public interface TextRenderer {
     static TextRenderer get() {
@@ -16,11 +17,11 @@ public interface TextRenderer {
 
     void setAlpha(double a);
 
-    void begin(double scale, boolean scaleOnly, boolean big);
-    default void begin(double scale) { begin(scale, false, false); }
-    default void begin() { begin(1, false, false); }
+    void begin(GuiGraphicsExtractor graphics, double scale, boolean scaleOnly, boolean big);
+    default void begin(GuiGraphicsExtractor graphics, double scale) { begin(graphics, scale, false, false); }
+    default void begin(GuiGraphicsExtractor graphics) { begin(graphics, 1, false, false); }
 
-    default void beginBig() { begin(1, false, true); }
+    default void beginBig(GuiGraphicsExtractor graphics) { begin(graphics, 1, false, true); }
 
     double getWidth(String text, int length, boolean shadow);
     default double getWidth(String text, boolean shadow) { return getWidth(text, text.length(), shadow); }

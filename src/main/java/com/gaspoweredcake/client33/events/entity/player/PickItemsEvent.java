@@ -5,7 +5,7 @@
 
 package com.gaspoweredcake.client33.events.entity.player;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public class PickItemsEvent {
     private static final PickItemsEvent INSTANCE = new PickItemsEvent();

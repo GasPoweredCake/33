@@ -5,6 +5,7 @@
 
 package com.gaspoweredcake.client33.systems.modules.render;
 
+import com.mojang.blaze3d.GpuFormat;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.buffers.Std140Builder;
 import com.mojang.blaze3d.buffers.Std140SizeCalculator;
@@ -12,7 +13,6 @@ import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.textures.GpuTextureView;
-import com.mojang.blaze3d.textures.TextureFormat;
 import it.unimi.dsi.fastutil.ints.IntFloatImmutablePair;
 import com.gaspoweredcake.client33.Client33;
 import com.gaspoweredcake.client33.events.game.ResolutionChangedEvent;
@@ -28,10 +28,11 @@ import com.gaspoweredcake.client33.settings.SettingGroup;
 import com.gaspoweredcake.client33.systems.modules.Categories;
 import com.gaspoweredcake.client33.systems.modules.Module;
 import meteordevelopment.orbit.listeners.ConsumerListener;
-import net.minecraft.client.gl.DynamicUniformStorage;
-import net.minecraft.client.gui.screen.ChatScreen;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.screens.ChatScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.DynamicUniformStorage;
+import org.jspecify.annotations.NonNull;
 
 import java.nio.ByteBuffer;
 
@@ -87,7 +88,7 @@ public class Blur extends Module {
 
     private final Setting<Boolean> client33 = sgScreens.add(new BoolSetting.Builder()
         .name("client33")
-        .description("Applies blur to 33 screens.")
+        .description("Applies blur to Client33 screens.")
         .defaultValue(true)
         .build());
 
@@ -148,10 +149,10 @@ public class Blur extends Module {
     private GpuTextureView createFbo(int i) {
         double scale = 1 / Math.pow(2, i);
 
-        int width = (int) (mc.getWindow().getFramebufferWidth() * scale);
-        int height = (int) (mc.getWindow().getFramebufferHeight() * scale);
+        int width = (int) (mc.getWindow().getWidth() * scale);
+        int height = (int) (mc.getWindow().getHeight() * scale);
 
-        return RenderSystem.getDevice().createTextureView(RenderSystem.getDevice().createTexture("Blur - " + i, 15,  TextureFormat.RGBA8, width, height, 1, 1));
+        return RenderSystem.getDevice().createTextureView(RenderSystem.getDevice().createTexture("Blur - " + i, 15, GpuFormat.RGBA8_UNORM, width, height, 1, 1));
     }
 
     private void onRenderAfterWorld() {
@@ -199,7 +200,7 @@ public class Blur extends Module {
         }
 
         // Initial downsample
-        renderToFbo(fbos[0], mc.getFramebuffer().getColorAttachmentView(), Client33RenderPipelines.BLUR_DOWN, ubos[0]);
+        renderToFbo(fbos[0], mc.gameRenderer.mainRenderTarget().getColorTextureView(), Client33RenderPipelines.BLUR_DOWN, ubos[0]);
 
         // Downsample
         for (int i = 0; i < iterations; i++) {
@@ -213,10 +214,10 @@ public class Blur extends Module {
 
         // Render output
         MeshRenderer.begin()
-            .attachments(mc.getFramebuffer())
+            .attachments(mc.gameRenderer.mainRenderTarget())
             .pipeline(Client33RenderPipelines.BLUR_PASSTHROUGH)
             .fullscreen()
-            .sampler("u_Texture", fbos[0], RenderSystem.getSamplerCache().get(FilterMode.LINEAR)) // todo ???
+            .sampler("u_Texture", fbos[0], RenderSystem.getSamplerCache().getClampToEdge(FilterMode.LINEAR)) // todo ???
             .end();
     }
 
@@ -226,16 +227,16 @@ public class Blur extends Module {
             .pipeline(pipeline)
             .fullscreen()
             .uniform("BlurData", ubo)
-            .sampler("u_Texture", sourceTexture, RenderSystem.getSamplerCache().get(FilterMode.LINEAR))
+            .sampler("u_Texture", sourceTexture, RenderSystem.getSamplerCache().getClampToEdge(FilterMode.LINEAR))
             .end();
     }
 
     private boolean shouldRender() {
         if (!isActive()) return false;
-        Screen screen = mc.currentScreen;
+        Screen screen = mc.gui.screen();
 
         if (screen instanceof WidgetScreen) return client33.get();
-        if (screen instanceof HandledScreen) return inventories.get();
+        if (screen instanceof AbstractContainerScreen) return inventories.get();
         if (screen instanceof ChatScreen) return chat.get();
         if (screen != null) return other.get();
 
@@ -264,11 +265,12 @@ public class Blur extends Module {
         .putFloat()
         .get();
 
-    private static final FixedUniformStorage<BlurUniformData> UNIFORM_STORAGE = new FixedUniformStorage<>("33 - Blur UBO", UNIFORM_SIZE, 6);
+    private static final FixedUniformStorage<BlurUniformData> UNIFORM_STORAGE = new FixedUniformStorage<>("Client33 - Blur UBO", UNIFORM_SIZE, 6);
 
-    private record BlurUniformData(float halfTexelSizeX, float halfTexelSizeY, float offset) implements DynamicUniformStorage.Uploadable {
+    private record BlurUniformData(float halfTexelSizeX, float halfTexelSizeY,
+                                   float offset) implements DynamicUniformStorage.DynamicUniform {
         @Override
-        public void write(ByteBuffer buffer) {
+        public void write(@NonNull ByteBuffer buffer) {
             Std140Builder.intoBuffer(buffer)
                 .putVec2(halfTexelSizeX, halfTexelSizeY)
                 .putFloat(offset);

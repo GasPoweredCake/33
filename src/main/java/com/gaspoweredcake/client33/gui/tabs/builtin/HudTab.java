@@ -17,8 +17,7 @@ import com.gaspoweredcake.client33.gui.widgets.pressable.WCheckbox;
 import com.gaspoweredcake.client33.systems.hud.Hud;
 import com.gaspoweredcake.client33.systems.hud.screens.HudEditorScreen;
 import com.gaspoweredcake.client33.utils.misc.NbtUtils;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.Screen;
 
 import static com.gaspoweredcake.client33.Client33.mc;
 
@@ -56,7 +55,7 @@ public class HudTab extends Tab {
             add(theme.horizontalSeparator()).expandX();
 
             WButton openEditor = add(theme.button("Edit")).expandX().widget();
-            openEditor.action = () -> mc.setScreen(new HudEditorScreen(theme));
+            openEditor.action = () -> mc.gui.setScreen(new HudEditorScreen(theme));
 
             WHorizontalList buttons = add(theme.horizontalList()).expandX().widget();
             buttons.add(theme.confirmedButton("Clear", "Confirm")).expandX().widget().action = hud::clear;
@@ -73,11 +72,6 @@ public class HudTab extends Tab {
             WButton resetSettings = bottom.add(theme.button(GuiRenderer.RESET)).widget();
             resetSettings.action = hud.settings::reset;
             resetSettings.tooltip = "Reset";
-        }
-
-        @Override
-        protected void onRenderBefore(DrawContext drawContext, float delta) {
-            HudEditorScreen.renderElements(drawContext);
         }
 
         @Override

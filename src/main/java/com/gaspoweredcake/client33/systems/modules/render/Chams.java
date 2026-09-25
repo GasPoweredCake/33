@@ -10,9 +10,9 @@ import com.gaspoweredcake.client33.settings.*;
 import com.gaspoweredcake.client33.systems.modules.Categories;
 import com.gaspoweredcake.client33.systems.modules.Module;
 import com.gaspoweredcake.client33.utils.render.color.SettingColor;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.util.Identifier;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.resources.Identifier;
 
 import java.util.Set;
 
@@ -41,7 +41,7 @@ public class Chams extends Module {
     public final Setting<SettingColor> shaderColor = sgThroughWalls.add(new ColorSetting.Builder()
         .name("color")
         .description("The color that the shader is drawn with.")
-        .defaultValue(new SettingColor(242, 238, 255, 150))
+        .defaultValue(new SettingColor(157, 111, 255, 150))
         .visible(() -> shader.get() != Shader.None)
         .build()
     );

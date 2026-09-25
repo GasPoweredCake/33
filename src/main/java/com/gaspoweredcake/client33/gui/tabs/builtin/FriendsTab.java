@@ -18,7 +18,7 @@ import com.gaspoweredcake.client33.systems.friends.Friend;
 import com.gaspoweredcake.client33.systems.friends.Friends;
 import com.gaspoweredcake.client33.utils.misc.NbtUtils;
 import com.gaspoweredcake.client33.utils.network.Client33Executor;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.Screen;
 
 import static com.gaspoweredcake.client33.Client33.mc;
 
@@ -52,7 +52,7 @@ public class FriendsTab extends Tab {
             // New
             WHorizontalList list = add(theme.horizontalList()).expandX().widget();
 
-            WTextBox nameW = list.add(theme.textBox("", (text, c) -> c != ' ')).expandX().widget();
+            WTextBox nameW = list.add(theme.textBox("", (_, c) -> c != ' ')).expandX().widget();
             nameW.setFocused(true);
 
             WPlus add = list.add(theme.plus()).widget();

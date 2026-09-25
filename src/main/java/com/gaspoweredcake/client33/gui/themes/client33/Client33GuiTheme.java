@@ -31,7 +31,7 @@ import com.gaspoweredcake.client33.systems.accounts.Account;
 import com.gaspoweredcake.client33.systems.modules.Module;
 import com.gaspoweredcake.client33.utils.render.color.Color;
 import com.gaspoweredcake.client33.utils.render.color.SettingColor;
-import net.minecraft.client.util.MacWindowUtil;
+import com.mojang.blaze3d.platform.MacosUtil;
 
 import static com.gaspoweredcake.client33.Client33.mc;
 
@@ -60,7 +60,7 @@ public class Client33GuiTheme extends GuiTheme {
         .sliderRange(0.75, 4)
         .onSliderRelease()
         .onChanged(aDouble -> {
-            if (mc.currentScreen instanceof WidgetScreen) ((WidgetScreen) mc.currentScreen).invalidate();
+            if (mc.gui.screen() instanceof WidgetScreen) ((WidgetScreen) mc.gui.screen()).invalidate();
         })
         .build()
     );
@@ -84,8 +84,15 @@ public class Client33GuiTheme extends GuiTheme {
         .description("Hide HUD when in GUI.")
         .defaultValue(false)
         .onChanged(v -> {
-            if (mc.currentScreen instanceof WidgetScreen) mc.options.hudHidden = v;
+            if (mc.gui.screen() instanceof WidgetScreen) mc.gameRenderer.gameRenderState().guiRenderState.isHudHidden = v;
         })
+        .build()
+    );
+
+    public final Setting<Boolean> modulesHelpText = sgGeneral.add(new BoolSetting.Builder()
+        .name("modules-help-text")
+        .description("Toggle help text in the modules screen.")
+        .defaultValue(true)
         .build()
     );
 
@@ -395,8 +402,8 @@ public class Client33GuiTheme extends GuiTheme {
     public double scale(double value) {
         double scaled = value * scale.get();
 
-        if (MacWindowUtil.IS_MAC) {
-            scaled /= (double) mc.getWindow().getWidth() / mc.getWindow().getFramebufferWidth();
+        if (MacosUtil.IS_MACOS) {
+            scaled /= (double) mc.getWindow().getWidth() / mc.getWindow().getWidth();
         }
 
         return scaled;
@@ -405,6 +412,11 @@ public class Client33GuiTheme extends GuiTheme {
     @Override
     public boolean categoryIcons() {
         return categoryIcons.get();
+    }
+
+    @Override
+    public boolean modulesHelpText() {
+        return modulesHelpText.get();
     }
 
     @Override

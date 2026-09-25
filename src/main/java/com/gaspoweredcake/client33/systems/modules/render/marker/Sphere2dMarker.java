@@ -13,7 +13,7 @@ import com.gaspoweredcake.client33.utils.network.Client33Executor;
 import com.gaspoweredcake.client33.utils.player.PlayerUtils;
 import com.gaspoweredcake.client33.utils.render.color.SettingColor;
 import com.gaspoweredcake.client33.utils.world.Dir;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +39,7 @@ public class Sphere2dMarker extends BaseMarker {
     private final Setting<BlockPos> center = sgGeneral.add(new BlockPosSetting.Builder()
         .name("center")
         .description("Center of the sphere")
-        .onChanged(bp -> dirty = true)
+        .onChanged(_ -> dirty = true)
         .build()
     );
 
@@ -49,7 +49,7 @@ public class Sphere2dMarker extends BaseMarker {
         .defaultValue(20)
         .min(1)
         .noSlider()
-        .onChanged(r -> dirty = true)
+        .onChanged(_ -> dirty = true)
         .build()
     );
 
@@ -59,7 +59,7 @@ public class Sphere2dMarker extends BaseMarker {
         .defaultValue(0)
         .min(0)
         .noSlider()
-        .onChanged(l -> dirty = true)
+        .onChanged(_ -> dirty = true)
         .build()
     );
 
@@ -92,14 +92,14 @@ public class Sphere2dMarker extends BaseMarker {
     private final Setting<SettingColor> sideColor = sgRender.add(new ColorSetting.Builder()
         .name("side-color")
         .description("The color of the sides of the blocks being rendered.")
-        .defaultValue(new SettingColor(100, 215, 230, 50))
+        .defaultValue(new SettingColor(0, 100, 255, 50))
         .build()
     );
 
     private final Setting<SettingColor> lineColor = sgRender.add(new ColorSetting.Builder()
         .name("line-color")
         .description("The color of the lines of the blocks being rendered.")
-        .defaultValue(new SettingColor(100, 215, 230, 255))
+        .defaultValue(new SettingColor(0, 100, 255, 255))
         .build()
     );
 

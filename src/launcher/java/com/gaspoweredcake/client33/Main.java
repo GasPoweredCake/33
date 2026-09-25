@@ -31,7 +31,7 @@ public class Main {
 
         switch (option) {
             case 0:
-                getOS().open("https://github.com/GasPoweredCake/33");
+                getOS().open("https://github.com/GasPoweredCake/33#install");
                 break;
             case 1: {
                 File mods = new File(getModsFolder());

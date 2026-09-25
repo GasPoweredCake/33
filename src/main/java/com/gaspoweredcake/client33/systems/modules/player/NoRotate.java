@@ -6,14 +6,14 @@
 package com.gaspoweredcake.client33.systems.modules.player;
 
 import com.llamalad7.mixinextras.sugar.ref.LocalFloatRef;
-import com.gaspoweredcake.client33.mixin.ClientPlayNetworkHandlerMixin;
+import com.gaspoweredcake.client33.mixin.ClientPacketListenerMixin;
 import com.gaspoweredcake.client33.systems.modules.Categories;
 import com.gaspoweredcake.client33.systems.modules.Module;
-import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
+import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * @see ClientPlayNetworkHandlerMixin#onPlayerPositionLookHead(PlayerPositionLookS2CPacket, CallbackInfo, LocalFloatRef, LocalFloatRef)
+ * @see ClientPacketListenerMixin#onHandleMovePlayerHead(ClientboundPlayerPositionPacket, CallbackInfo, LocalFloatRef, LocalFloatRef)
  */
 public class NoRotate extends Module {
     public NoRotate() {

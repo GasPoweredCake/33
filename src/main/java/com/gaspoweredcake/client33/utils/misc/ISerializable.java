@@ -5,10 +5,10 @@
 
 package com.gaspoweredcake.client33.utils.misc;
 
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.CompoundTag;
 
 public interface ISerializable<T> {
-    NbtCompound toTag();
+    CompoundTag toTag();
 
-    T fromTag(NbtCompound tag);
+    T fromTag(CompoundTag tag);
 }

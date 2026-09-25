@@ -13,7 +13,7 @@ import com.gaspoweredcake.client33.systems.friends.Friend;
 import com.gaspoweredcake.client33.systems.friends.Friends;
 import com.gaspoweredcake.client33.utils.network.Capes;
 import com.gaspoweredcake.client33.utils.network.Client33Executor;
-import net.minecraft.command.CommandSource;
+import net.minecraft.client.multiplayer.ClientSuggestionProvider;
 
 public class ReloadCommand extends Command {
     public ReloadCommand() {
@@ -21,8 +21,8 @@ public class ReloadCommand extends Command {
     }
 
     @Override
-    public void build(LiteralArgumentBuilder<CommandSource> builder) {
-        builder.executes(context -> {
+    public void build(LiteralArgumentBuilder<ClientSuggestionProvider> builder) {
+        builder.executes(_ -> {
             warning("Reloading systems, this may take a while.");
 
             Systems.load();

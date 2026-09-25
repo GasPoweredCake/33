@@ -33,26 +33,27 @@
     "client33-lithium.mixins.json",
     "client33-viafabricplus.mixins.json"
   ],
-  "accessWidener": "client33.accesswidener",
+  "accessWidener": "client33.classtweaker",
   "custom": {
     "client33:build_number": "${build_number}",
     "client33:color": "157,111,255",
     "client33:commit": "${commit}",
+    "modmenu": {},
     "badoptimizations:cache_hooks": {
       "lightmap": "com.gaspoweredcake.client33.modintegration.BadOptimizationsHook"
     }
   },
   "depends": {
-    "java": ">=21",
-    "minecraft": ["${minecraft_version}"],
+    "java": ">=${jdk_version}",
+    "minecraft": "${minecraft_version}",
     "fabricloader": ">=${loader_version}"
   },
   "breaks": {
     "optifabric": "*",
     "feather": "*",
     "origins": "*",
-    "sodium": "<0.8.7",
+    "sodium": "<0.9.1",
     "morechathistory": "*",
-    "lithium": "<0.21.3"
+    "lithium": "<0.22.1"
   }
 }

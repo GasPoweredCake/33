@@ -5,7 +5,7 @@
 
 package com.gaspoweredcake.client33.mixininterface;
 
-import com.mojang.blaze3d.systems.RenderPass;
+import com.mojang.blaze3d.systems.RenderPassBackend;
 
 public interface IGpuDevice {
     /**
@@ -20,5 +20,5 @@ public interface IGpuDevice {
      */
     @Deprecated
     @SuppressWarnings("DeprecatedIsStillUsed")
-    void client33$onCreateRenderPass(RenderPass pass);
+    void client33$onCreateRenderPass(RenderPassBackend backend);
 }

@@ -6,7 +6,7 @@
 package com.gaspoweredcake.client33.gui.tabs;
 
 import com.gaspoweredcake.client33.gui.GuiTheme;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.Screen;
 
 import static com.gaspoweredcake.client33.Client33.mc;
 
@@ -20,7 +20,7 @@ public abstract class Tab {
     public void openScreen(GuiTheme theme) {
         TabScreen screen = this.createScreen(theme);
         screen.addDirect(theme.topBar()).top().centerX();
-        mc.setScreen(screen);
+        mc.gui.setScreen(screen);
     }
 
     public abstract TabScreen createScreen(GuiTheme theme);

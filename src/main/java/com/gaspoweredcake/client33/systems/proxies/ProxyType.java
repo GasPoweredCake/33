@@ -5,7 +5,7 @@
 
 package com.gaspoweredcake.client33.systems.proxies;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public enum ProxyType {
     Socks4,

@@ -6,7 +6,7 @@
 package com.gaspoweredcake.client33.gui.utils;
 
 import com.gaspoweredcake.client33.gui.widgets.WWidget;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class Cell<T extends WWidget> {
     private final T widget;

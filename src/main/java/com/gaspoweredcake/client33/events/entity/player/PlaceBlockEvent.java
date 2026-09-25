@@ -6,8 +6,8 @@
 package com.gaspoweredcake.client33.events.entity.player;
 
 import com.gaspoweredcake.client33.events.Cancellable;
-import net.minecraft.block.Block;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.core.BlockPos;
 
 public class PlaceBlockEvent extends Cancellable {
     private static final PlaceBlockEvent INSTANCE = new PlaceBlockEvent();

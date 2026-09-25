@@ -5,14 +5,14 @@
 
 package com.gaspoweredcake.client33.mixin;
 
-import net.minecraft.client.texture.PlayerSkinProvider;
+import net.minecraft.client.resources.SkinManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 import java.nio.file.Path;
 
-@Mixin(PlayerSkinProvider.FileCache.class)
+@Mixin(SkinManager.TextureCache.class)
 public interface FileCacheAccessor {
-    @Accessor("directory")
-    Path client33$getDirectory();
+    @Accessor("root")
+    Path client33$getRoot();
 }

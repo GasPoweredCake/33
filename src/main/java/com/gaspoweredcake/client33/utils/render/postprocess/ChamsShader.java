@@ -5,11 +5,11 @@
 
 package com.gaspoweredcake.client33.utils.render.postprocess;
 
+import com.mojang.blaze3d.GpuFormat;
 import com.mojang.blaze3d.buffers.Std140Builder;
 import com.mojang.blaze3d.buffers.Std140SizeCalculator;
 import com.mojang.blaze3d.platform.TextureUtil;
 import com.mojang.blaze3d.textures.FilterMode;
-import com.mojang.blaze3d.textures.TextureFormat;
 import com.gaspoweredcake.client33.Client33;
 import com.gaspoweredcake.client33.events.game.ResourcePacksReloadedEvent;
 import com.gaspoweredcake.client33.renderer.MeshRenderer;
@@ -20,9 +20,10 @@ import com.gaspoweredcake.client33.systems.modules.render.Chams;
 import com.gaspoweredcake.client33.utils.PostInit;
 import com.gaspoweredcake.client33.utils.render.color.Color;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.gl.DynamicUniformStorage;
-import net.minecraft.entity.Entity;
-import net.minecraft.resource.Resource;
+import net.minecraft.client.renderer.DynamicUniformStorage;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.world.entity.Entity;
+import org.jspecify.annotations.NonNull;
 import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
 
@@ -34,7 +35,7 @@ import java.util.Optional;
 import static com.gaspoweredcake.client33.Client33.mc;
 
 public class ChamsShader extends EntityShader {
-    private static final String[] FILE_FORMATS = { "png", "jpg" };
+    private static final String[] FILE_FORMATS = {"png", "jpg"};
 
     private static Texture IMAGE_TEX;
     private static Chams chams;
@@ -50,11 +51,11 @@ public class ChamsShader extends EntityShader {
             ByteBuffer data = null;
             for (String fileFormat : FILE_FORMATS) {
                 Optional<Resource> optional = mc.getResourceManager().getResource(Client33.identifier("textures/chams." + fileFormat));
-                if (optional.isEmpty() || optional.get().getInputStream() == null) {
+                if (optional.isEmpty() || optional.get().open() == null) {
                     continue;
                 }
 
-                data = TextureUtil.readResource(optional.get().getInputStream());
+                data = TextureUtil.readResource(optional.get().open());
                 break;
             }
             if (data == null) return;
@@ -69,14 +70,13 @@ public class ChamsShader extends EntityShader {
                 STBImage.stbi_set_flip_vertically_on_load(true);
                 ByteBuffer image = STBImage.stbi_load_from_memory(data, width, height, comp, 4);
 
-                IMAGE_TEX = new Texture(width.get(0), height.get(0), TextureFormat.RGBA8, FilterMode.NEAREST, FilterMode.NEAREST);
+                IMAGE_TEX = new Texture(width.get(0), height.get(0), GpuFormat.RGBA8_UNORM, FilterMode.NEAREST, FilterMode.NEAREST);
                 IMAGE_TEX.upload(image);
 
                 STBImage.stbi_image_free(image);
                 STBImage.stbi_set_flip_vertically_on_load(false);
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             Client33.LOG.error("Error loading the chams shader", e);
         }
     }
@@ -90,12 +90,12 @@ public class ChamsShader extends EntityShader {
     protected void setupPass(MeshRenderer renderer) {
         Color color = chams.shaderColor.get();
 
-        renderer.uniform("ImageData", UNIFORM_STORAGE.write(new UniformData(
+        renderer.uniform("ImageData", UNIFORM_STORAGE.writeUniform(new UniformData(
             color.r / 255f, color.g / 255f, color.b / 255f, color.a / 255f
         )));
 
         if (chams.isShader() && chams.shader.get() == Chams.Shader.Image && IMAGE_TEX != null) {
-            renderer.sampler("u_TextureI", IMAGE_TEX.getGlTextureView(), IMAGE_TEX.getSampler());
+            renderer.sampler("u_TextureI", IMAGE_TEX.getTextureView(), IMAGE_TEX.getSampler());
         }
     }
 
@@ -117,15 +117,15 @@ public class ChamsShader extends EntityShader {
         .putVec4()
         .get();
 
-    private static final DynamicUniformStorage<UniformData> UNIFORM_STORAGE = new DynamicUniformStorage<>("33 - Image UBO", UNIFORM_SIZE, 16);
+    private static final DynamicUniformStorage<UniformData> UNIFORM_STORAGE = new DynamicUniformStorage<>("Client33 - Image UBO", UNIFORM_SIZE, 16);
 
     public static void flipFrame() {
-        UNIFORM_STORAGE.clear();
+        UNIFORM_STORAGE.endFrame();
     }
 
-    private record UniformData(float r, float g, float b, float a) implements DynamicUniformStorage.Uploadable {
+    private record UniformData(float r, float g, float b, float a) implements DynamicUniformStorage.DynamicUniform {
         @Override
-        public void write(ByteBuffer buffer) {
+        public void write(@NonNull ByteBuffer buffer) {
             Std140Builder.intoBuffer(buffer)
                 .putVec4(r, g, b, a);
         }

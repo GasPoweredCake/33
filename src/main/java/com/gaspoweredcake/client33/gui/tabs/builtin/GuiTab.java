@@ -15,7 +15,7 @@ import com.gaspoweredcake.client33.gui.widgets.containers.WHorizontalList;
 import com.gaspoweredcake.client33.gui.widgets.input.WDropdown;
 import com.gaspoweredcake.client33.gui.widgets.pressable.WButton;
 import com.gaspoweredcake.client33.utils.misc.NbtUtils;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.Screen;
 
 import static com.gaspoweredcake.client33.Client33.mc;
 
@@ -50,7 +50,7 @@ public class GuiTab extends Tab {
             themeW.action = () -> {
                 GuiThemes.select(themeW.get());
 
-                mc.setScreen(null);
+                mc.gui.setScreen(null);
                 tab.openScreen(GuiThemes.get());
             };
 
@@ -60,7 +60,7 @@ public class GuiTab extends Tab {
             WButton reset = opts.add(theme.button("Reset Colors")).right().widget();
             reset.action = () -> {
                 theme.settings.reset();
-                mc.setScreen(null);
+                mc.gui.setScreen(null);
                 tab.openScreen(GuiThemes.get());
             };
 

@@ -36,7 +36,7 @@ public class AddonManager {
 
                 @Override
                 public GithubRepo getRepo() {
-                    return new GithubRepo("GasPoweredCake", "33", "1.21.11", null);
+                    return new GithubRepo("GasPoweredCake", "33");
                 }
 
                 @Override

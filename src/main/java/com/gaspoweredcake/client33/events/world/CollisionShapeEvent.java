@@ -7,9 +7,9 @@ package com.gaspoweredcake.client33.events.world;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.gaspoweredcake.client33.events.Cancellable;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class CollisionShapeEvent extends Cancellable {
     private static final CollisionShapeEvent INSTANCE = new CollisionShapeEvent();

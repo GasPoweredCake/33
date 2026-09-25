@@ -16,9 +16,9 @@ import com.gaspoweredcake.client33.systems.modules.Module;
 import com.gaspoweredcake.client33.systems.modules.Modules;
 import com.gaspoweredcake.client33.systems.modules.world.Timer;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.PowderSnowBlock;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.PowderSnowBlock;
+import net.minecraft.world.phys.Vec3;
 
 public class FastClimb extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -76,12 +76,12 @@ public class FastClimb extends Module {
     @EventHandler
     private void onTick(TickEvent.Post event) {
         if (!timerMode.get() && climbing()) {
-            Vec3d velocity = mc.player.getVelocity();
-            mc.player.setVelocity(velocity.x, speed.get(), velocity.z);
+            Vec3 velocity = mc.player.getDeltaMovement();
+            mc.player.setDeltaMovement(velocity.x, speed.get(), velocity.z);
         }
     }
 
     private boolean climbing() {
-        return (mc.player.horizontalCollision || ((LivingEntityAccessor) mc.player).client33$isJumping()) && (mc.player.isClimbing() || mc.player.getBlockStateAtPos().isOf(Blocks.POWDER_SNOW) && PowderSnowBlock.canWalkOnPowderSnow(mc.player));
+        return (mc.player.horizontalCollision || ((LivingEntityAccessor) mc.player).client33$isJumping()) && (mc.player.onClimbable() || mc.player.getInBlockState().is(Blocks.POWDER_SNOW) && PowderSnowBlock.canEntityWalkOnPowderSnow(mc.player));
     }
 }

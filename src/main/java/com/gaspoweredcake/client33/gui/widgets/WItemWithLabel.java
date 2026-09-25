@@ -7,11 +7,12 @@ package com.gaspoweredcake.client33.gui.widgets;
 
 import com.gaspoweredcake.client33.gui.widgets.containers.WHorizontalList;
 import com.gaspoweredcake.client33.utils.misc.Names;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffectUtil;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffectUtil;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionContents;
 
 import java.util.Iterator;
 
@@ -39,15 +40,18 @@ public class WItemWithLabel extends WHorizontalList {
         String str = "";
 
         if (itemStack.getItem() == Items.POTION) {
-            Iterator<StatusEffectInstance> effects = itemStack.getItem().getComponents().get(DataComponentTypes.POTION_CONTENTS).getEffects().iterator();
+            PotionContents potionContents = itemStack.get(DataComponents.POTION_CONTENTS);
+            if (potionContents == null) return str;
+
+            Iterator<MobEffectInstance> effects = potionContents.getAllEffects().iterator();
             if (!effects.hasNext()) return str;
 
             str += " ";
 
-            StatusEffectInstance effect = effects.next();
+            MobEffectInstance effect = effects.next();
             if (effect.getAmplifier() > 0) str += "%d ".formatted(effect.getAmplifier() + 1);
 
-            str += "(%s)".formatted(StatusEffectUtil.getDurationText(effect, 1, mc.world != null ? mc.world.getTickManager().getTickRate() : 20.0F).getString());
+            str += "(%s)".formatted(MobEffectUtil.formatDuration(effect, 1, mc.level != null ? mc.level.tickRateManager().tickrate() : 20.0F).getString());
         }
 
         return str;

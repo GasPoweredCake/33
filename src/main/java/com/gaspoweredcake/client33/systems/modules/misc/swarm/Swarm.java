@@ -50,7 +50,7 @@ public class Swarm extends Module {
     public SwarmWorker worker;
 
     public Swarm() {
-        super(Categories.Misc, "swarm", "Allows you to control multiple instances of 33 from one central host.");
+        super(Categories.Misc, "swarm", "Allows you to control multiple instances of Client33 from one central host.");
     }
 
     @Override
@@ -72,7 +72,7 @@ public class Swarm extends Module {
         stop.action = this::close;
 
         WButton guide = list.add(theme.button("Guide")).expandX().widget();
-        guide.action = () -> Util.getOperatingSystem().open("https://github.com/MeteorDevelopment/meteor-client/wiki/Swarm-Guide");
+        guide.action = () -> Util.getPlatform().openUri("https://github.com/GasPoweredCake/33");
 
         return list;
     }
@@ -102,7 +102,8 @@ public class Swarm extends Module {
                 worker.disconnect();
                 worker = null;
             }
-        } catch (Exception ignored) {}
+        } catch (Exception _) {
+        }
     }
 
     @EventHandler

@@ -13,12 +13,12 @@ import com.gaspoweredcake.client33.systems.modules.Categories;
 import com.gaspoweredcake.client33.systems.modules.Module;
 import com.gaspoweredcake.client33.utils.render.color.Color;
 import com.gaspoweredcake.client33.utils.render.color.SettingColor;
-import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextColor;
-import net.minecraft.util.Formatting;
-import net.minecraft.world.GameMode;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.multiplayer.PlayerInfo;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextColor;
+import net.minecraft.world.level.GameType;
 
 public class BetterTab extends Module {
 
@@ -52,7 +52,7 @@ public class BetterTab extends Module {
     private final Setting<SettingColor> selfColor = sgGeneral.add(new ColorSetting.Builder()
         .name("self-color")
         .description("The color to highlight your name with.")
-        .defaultValue(new SettingColor(255, 195, 110))
+        .defaultValue(new SettingColor(250, 130, 30))
         .visible(self::get)
         .build()
     );
@@ -83,17 +83,16 @@ public class BetterTab extends Module {
         super(Categories.Render, "better-tab", "Various improvements to the tab list.");
     }
 
-    public Text getPlayerName(PlayerListEntry playerListEntry) {
-        Text name;
+    public Component getPlayerName(PlayerInfo playerListEntry) {
+        Component name;
         Color color = null;
 
-        name = playerListEntry.getDisplayName();
-        if (name == null) name = Text.literal(playerListEntry.getProfile().name());
+        name = playerListEntry.getTabListDisplayName();
+        if (name == null) name = Component.literal(playerListEntry.getProfile().name());
 
         if (playerListEntry.getProfile().id().toString().equals(mc.player.getGameProfile().id().toString()) && self.get()) {
             color = selfColor.get();
-        }
-        else if (friends.get() && Friends.get().isFriend(playerListEntry)) {
+        } else if (friends.get() && Friends.get().isFriend(playerListEntry)) {
             Friend friend = Friends.get().get(playerListEntry);
             if (friend != null) color = Config.get().friendColor.get();
         }
@@ -101,15 +100,16 @@ public class BetterTab extends Module {
         if (color != null) {
             String nameString = name.getString();
 
-            for (Formatting format : Formatting.values()) {
-                if (format.isColor()) nameString = nameString.replace(format.toString(), "");
+            for (ChatFormatting format : ChatFormatting.values()) {
+                if (TextColor.fromLegacyFormat(format) != null)
+                    nameString = nameString.replace(format.toString(), "");
             }
 
-            name = Text.literal(nameString).setStyle(name.getStyle().withColor(TextColor.fromRgb(color.getPacked())));
+            name = Component.literal(nameString).setStyle(name.getStyle().withColor(TextColor.fromRgb(color.getPacked())));
         }
 
         if (gamemode.get()) {
-            GameMode gm = playerListEntry.getGameMode();
+            GameType gm = playerListEntry.getGameMode();
             String gmText = "?";
             if (gm != null) {
                 gmText = switch (gm) {
@@ -119,7 +119,7 @@ public class BetterTab extends Module {
                     case ADVENTURE -> "A";
                 };
             }
-            MutableText text = Text.literal("");
+            MutableComponent text = Component.literal("");
             text.append(name);
             text.append(" [" + gmText + "]");
             name = text;

@@ -1,40 +1,47 @@
 package com.gaspoweredcake.client33.utils.render.postprocess;
 
+import com.mojang.blaze3d.GpuFormat;
 import com.mojang.blaze3d.buffers.Std140Builder;
 import com.mojang.blaze3d.buffers.Std140SizeCalculator;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.pipeline.RenderTarget;
+import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.FilterMode;
 import com.gaspoweredcake.client33.Client33;
 import com.gaspoweredcake.client33.renderer.MeshRenderer;
-import net.minecraft.client.gl.DynamicUniformStorage;
-import net.minecraft.client.gl.Framebuffer;
-import net.minecraft.client.gl.SimpleFramebuffer;
+import net.minecraft.client.gui.render.GuiRenderer;
+import net.minecraft.client.renderer.DynamicUniformStorage;
+import org.jspecify.annotations.NonNull;
 
 import java.nio.ByteBuffer;
 
 import static com.gaspoweredcake.client33.Client33.mc;
-import static org.lwjgl.glfw.GLFW.glfwGetTime;
 
 public abstract class PostProcessShader {
     protected final RenderPipeline pipeline;
-    public final Framebuffer framebuffer;
+    public final RenderTarget framebuffer;
 
     protected PostProcessShader(RenderPipeline pipeline) {
         this.pipeline = pipeline;
-        this.framebuffer = new SimpleFramebuffer(Client33.NAME + " PostProcessShader " + this.getClass().getSimpleName(), mc.getWindow().getFramebufferWidth(), mc.getWindow().getFramebufferHeight(), true);
+        this.framebuffer = new TextureTarget(Client33.NAME + " PostProcessShader " + this.getClass().getSimpleName(), mc.getWindow().getWidth(), mc.getWindow().getHeight(), true,
+            GpuFormat.RGBA8_UNORM);
     }
 
     protected abstract boolean shouldDraw();
 
-    protected void preDraw() {}
-    protected void postDraw() {}
+    protected void preDraw() {
+    }
+
+    protected void postDraw() {
+    }
 
     protected abstract void setupPass(MeshRenderer renderer);
 
     public void clearTexture() {
         if (this.shouldDraw()) {
-            RenderSystem.getDevice().createCommandEncoder().clearColorTexture(framebuffer.getColorAttachment(), 0);
+            RenderSystem.getDevice().createCommandEncoder().clearColorTexture(framebuffer.getColorTexture(),
+                GuiRenderer.CLEAR_COLOR);
         }
     }
 
@@ -50,14 +57,14 @@ public abstract class PostProcessShader {
         if (!shouldDraw()) return;
 
         var renderer = MeshRenderer.begin()
-            .attachments(mc.getFramebuffer())
+            .attachments(mc.gameRenderer.mainRenderTarget())
             .pipeline(pipeline)
             .fullscreen()
-            .uniform("PostData", UNIFORM_STORAGE.write(new UniformData(
-                (float) mc.getWindow().getFramebufferWidth(), (float) mc.getWindow().getFramebufferHeight(),
-                (float) glfwGetTime()
+            .uniform("PostData", UNIFORM_STORAGE.writeUniform(new UniformData(
+                (float) mc.getWindow().getWidth(), (float) mc.getWindow().getHeight(),
+                (float) (mc.getFrameTimeNs() / 1e9)
             )))
-            .sampler("u_Texture", framebuffer.getColorAttachmentView(), RenderSystem.getSamplerCache().get(FilterMode.NEAREST));
+            .sampler("u_Texture", framebuffer.getColorTextureView(), RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST));
 
         setupPass(renderer);
 
@@ -76,15 +83,15 @@ public abstract class PostProcessShader {
         .putFloat()
         .get();
 
-    private static final DynamicUniformStorage<UniformData> UNIFORM_STORAGE = new DynamicUniformStorage<>("33 - Post UBO", UNIFORM_SIZE, 16);
+    private static final DynamicUniformStorage<UniformData> UNIFORM_STORAGE = new DynamicUniformStorage<>("Client33 - Post UBO", UNIFORM_SIZE, 16);
 
     public static void flipFrame() {
-        UNIFORM_STORAGE.clear();
+        UNIFORM_STORAGE.endFrame();
     }
 
-    private record UniformData(float sizeX, float sizeY, float time) implements DynamicUniformStorage.Uploadable {
+    private record UniformData(float sizeX, float sizeY, float time) implements DynamicUniformStorage.DynamicUniform {
         @Override
-        public void write(ByteBuffer buffer) {
+        public void write(@NonNull ByteBuffer buffer) {
             Std140Builder.intoBuffer(buffer)
                 .putVec2(sizeX, sizeY)
                 .putFloat(time);

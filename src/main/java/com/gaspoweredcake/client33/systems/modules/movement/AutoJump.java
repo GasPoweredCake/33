@@ -6,7 +6,7 @@
 package com.gaspoweredcake.client33.systems.modules.movement;
 
 import com.gaspoweredcake.client33.events.world.TickEvent;
-import com.gaspoweredcake.client33.mixininterface.IVec3d;
+import com.gaspoweredcake.client33.mixininterface.IVec3;
 import com.gaspoweredcake.client33.settings.DoubleSetting;
 import com.gaspoweredcake.client33.settings.EnumSetting;
 import com.gaspoweredcake.client33.settings.Setting;
@@ -47,18 +47,18 @@ public class AutoJump extends Module {
 
     private boolean jump() {
         return switch (jumpIf.get()) {
-            case Sprinting -> mc.player.isSprinting() && (mc.player.forwardSpeed != 0 || mc.player.sidewaysSpeed != 0);
-            case Walking -> mc.player.forwardSpeed != 0 || mc.player.sidewaysSpeed != 0;
+            case Sprinting -> mc.player.isSprinting() && (mc.player.zza != 0 || mc.player.xxa != 0);
+            case Walking -> mc.player.zza != 0 || mc.player.xxa != 0;
             case Always -> true;
         };
     }
 
     @EventHandler
     private void onTick(TickEvent.Pre event) {
-        if (!mc.player.isOnGround() || mc.player.isSneaking() || !jump()) return;
+        if (!mc.player.onGround() || mc.player.isShiftKeyDown() || !jump()) return;
 
-        if (mode.get() == Mode.Jump) mc.player.jump();
-        else ((IVec3d) mc.player.getVelocity()).client33$setY(velocityHeight.get());
+        if (mode.get() == Mode.Jump) mc.player.jumpFromGround();
+        else ((IVec3) mc.player.getDeltaMovement()).client33$setY(velocityHeight.get());
     }
 
     public enum JumpWhen {

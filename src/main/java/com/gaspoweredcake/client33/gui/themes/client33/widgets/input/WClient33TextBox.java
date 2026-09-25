@@ -15,7 +15,7 @@ import com.gaspoweredcake.client33.gui.widgets.containers.WContainer;
 import com.gaspoweredcake.client33.gui.widgets.containers.WVerticalList;
 import com.gaspoweredcake.client33.gui.widgets.input.WTextBox;
 import com.gaspoweredcake.client33.utils.render.color.Color;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 
 public class WClient33TextBox extends WTextBox implements Client33Widget {
     private boolean cursorVisible;
@@ -131,7 +131,7 @@ public class WClient33TextBox extends WTextBox implements Client33Widget {
 
         // Cursor
         animProgress += delta * 10 * (focused && cursorVisible ? 1 : -1);
-        animProgress = MathHelper.clamp(animProgress, 0, 1);
+        animProgress = Mth.clamp(animProgress, 0, 1);
 
         if ((focused && cursorVisible) || animProgress > 0) {
             renderer.setAlpha(animProgress);

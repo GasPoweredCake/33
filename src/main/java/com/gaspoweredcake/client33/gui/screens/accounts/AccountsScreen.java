@@ -16,7 +16,7 @@ import com.gaspoweredcake.client33.systems.accounts.AccountType;
 import com.gaspoweredcake.client33.systems.accounts.Accounts;
 import com.gaspoweredcake.client33.utils.misc.NbtUtils;
 import com.gaspoweredcake.client33.utils.network.Client33Executor;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import static com.gaspoweredcake.client33.Client33.mc;
 
@@ -36,10 +36,10 @@ public class AccountsScreen extends WindowScreen {
         // Add account
         WHorizontalList l = add(theme.horizontalList()).expandX().widget();
 
-        addButton(l, "Cracked", () -> mc.setScreen(new AddCrackedAccountScreen(theme, this)));
-        addButton(l, "Altening", () -> mc.setScreen(new AddAlteningAccountScreen(theme, this)));
-        addButton(l, "Session", () -> mc.setScreen(new AddSessionAccountScreen(theme, this)));
-        addButton(l, "Microsoft", () -> mc.setScreen(new AddMicrosoftAccountScreen(theme, this)));
+        addButton(l, "Cracked", () -> mc.gui.setScreen(new AddCrackedAccountScreen(theme, this)));
+        addButton(l, "Altening", () -> mc.gui.setScreen(new AddAlteningAccountScreen(theme, this)));
+        addButton(l, "Session", () -> mc.gui.setScreen(new AddSessionAccountScreen(theme, this)));
+        addButton(l, "Microsoft", () -> mc.gui.setScreen(new AddMicrosoftAccountScreen(theme, this)));
     }
 
     private void addButton(WContainer c, String text, Runnable action) {
@@ -68,7 +68,7 @@ public class AccountsScreen extends WindowScreen {
             mc.execute(() -> {
                 if (screen != null) {
                     screen.locked = false;
-                    screen.close();
+                    screen.onClose();
                 }
 
                 parent.reload();

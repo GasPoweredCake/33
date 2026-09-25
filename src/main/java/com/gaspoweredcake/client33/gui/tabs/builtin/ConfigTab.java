@@ -13,7 +13,7 @@ import com.gaspoweredcake.client33.settings.Settings;
 import com.gaspoweredcake.client33.systems.config.Config;
 import com.gaspoweredcake.client33.utils.misc.NbtUtils;
 import com.gaspoweredcake.client33.utils.render.prompts.YesNoPrompt;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.Screen;
 
 public class ConfigTab extends Tab {
     public ConfigTab() {
@@ -51,18 +51,16 @@ public class ConfigTab extends Tab {
                         .onYes(() -> Config.get().prefix.set("."))
                         .id("empty-command-prefix")
                         .show();
-                }
-                else if (prefix.equals("/")) {
+                } else if (prefix.equals("/")) {
                     YesNoPrompt.create(theme, this.parent)
                         .title("Potential prefix conflict")
                         .message("You have set your command prefix to '/', which is used by minecraft.")
-                        .message("This can cause conflicts between client commands and Minecraft commands.")
+                        .message("This can cause conflict issues between client33 and minecraft commands.")
                         .message("Do you want to reset your prefix to '.'?")
                         .onYes(() -> Config.get().prefix.set("."))
                         .id("minecraft-prefix-conflict")
                         .show();
-                }
-                else if (prefix.length() > 7) {
+                } else if (prefix.length() > 7) {
                     YesNoPrompt.create(theme, this.parent)
                         .title("Long command prefix")
                         .message("You have set your command prefix to a very long string.")

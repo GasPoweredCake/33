@@ -5,7 +5,7 @@
 
 package com.gaspoweredcake.client33.utils.world;
 
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
 
 public enum CardinalDirection {
     North,

@@ -4,7 +4,7 @@ import com.gaspoweredcake.client33.renderer.MeshRenderer;
 import com.gaspoweredcake.client33.renderer.Client33RenderPipelines;
 import com.gaspoweredcake.client33.systems.modules.Modules;
 import com.gaspoweredcake.client33.systems.modules.render.ESP;
-import net.minecraft.entity.Entity;
+import net.minecraft.world.entity.Entity;
 
 public class EntityOutlineShader extends EntityShader {
     private static ESP esp;

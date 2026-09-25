@@ -14,7 +14,7 @@ import com.gaspoweredcake.client33.systems.modules.Module;
 import com.gaspoweredcake.client33.utils.Utils;
 import com.gaspoweredcake.client33.utils.player.ChatUtils;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.gui.screen.DisconnectedScreen;
+import net.minecraft.client.gui.screens.DisconnectedScreen;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.List;
@@ -25,7 +25,7 @@ public class Spam extends Module {
     private final Setting<List<String>> messages = sgGeneral.add(new StringListSetting.Builder()
         .name("messages")
         .description("Messages to use for spam.")
-        .defaultValue(List.of("33"))
+        .defaultValue(List.of("Client33 on Crack!"))
         .build()
     );
 

@@ -5,12 +5,12 @@
 
 package com.gaspoweredcake.client33.renderer;
 
+import com.mojang.blaze3d.textures.GpuSampler;
 import com.mojang.blaze3d.textures.GpuTextureView;
 import com.gaspoweredcake.client33.gui.renderer.packer.TextureRegion;
 import com.gaspoweredcake.client33.utils.PreInit;
 import com.gaspoweredcake.client33.utils.render.color.Color;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.GpuSampler;
+import net.minecraft.client.Minecraft;
 
 public class Renderer2D {
     public static Renderer2D COLOR;
@@ -64,16 +64,16 @@ public class Renderer2D {
         if (triangles.isBuilding()) triangles.end();
 
         MeshRenderer.begin()
-            .attachments(MinecraftClient.getInstance().getFramebuffer())
-            .pipeline(textured ? Client33RenderPipelines.UI_TEXTURED : Client33RenderPipelines.UI_COLORED)
-            .mesh(triangles)
-            .sampler(samplerName, samplerView, sampler)
+            .attachments(Minecraft.getInstance().gameRenderer.mainRenderTarget())
+            .pipeline(Client33RenderPipelines.UI_COLORED_LINES)
+            .mesh(lines)
             .end();
 
         MeshRenderer.begin()
-            .attachments(MinecraftClient.getInstance().getFramebuffer())
-            .pipeline(Client33RenderPipelines.UI_COLORED_LINES)
-            .mesh(lines)
+            .attachments(Minecraft.getInstance().gameRenderer.mainRenderTarget())
+            .pipeline(textured ? Client33RenderPipelines.UI_TEXTURED : Client33RenderPipelines.UI_COLORED)
+            .mesh(triangles)
+            .sampler(samplerName, samplerView, sampler)
             .end();
     }
 

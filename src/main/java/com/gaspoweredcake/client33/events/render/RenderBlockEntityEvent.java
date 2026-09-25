@@ -6,7 +6,7 @@
 package com.gaspoweredcake.client33.events.render;
 
 import com.gaspoweredcake.client33.events.Cancellable;
-import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 
 public class RenderBlockEntityEvent extends Cancellable {
     private static final RenderBlockEntityEvent INSTANCE = new RenderBlockEntityEvent();

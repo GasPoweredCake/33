@@ -5,23 +5,22 @@
 
 package com.gaspoweredcake.client33.utils.misc.input;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.gaspoweredcake.client33.Client33;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
-import org.lwjgl.glfw.GLFW;
+import net.minecraft.client.KeyMapping;
 
 public class KeyBinds {
-    private static final KeyBinding.Category CATEGORY = KeyBinding.Category.create(Client33.identifier("client33"));
+    private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(Client33.identifier("client33"));
 
-    public static KeyBinding OPEN_GUI = new KeyBinding("key.client33.open-gui", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_RIGHT_SHIFT, CATEGORY);
-    public static KeyBinding OPEN_COMMANDS = new KeyBinding("key.client33.open-commands", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_PERIOD, CATEGORY);
+    public static KeyMapping OPEN_GUI = new KeyMapping("key.client33.open-gui", InputConstants.Type.KEYSYM, InputConstants.KEY_RSHIFT, CATEGORY);
+    public static KeyMapping OPEN_COMMANDS = new KeyMapping("key.client33.open-commands", InputConstants.Type.KEYSYM, InputConstants.KEY_PERIOD, CATEGORY);
 
     private KeyBinds() {
     }
 
-    public static KeyBinding[] apply(KeyBinding[] binds) {
+    public static KeyMapping[] apply(KeyMapping[] binds) {
         // Add key binding
-        KeyBinding[] newBinds = new KeyBinding[binds.length + 2];
+        KeyMapping[] newBinds = new KeyMapping[binds.length + 2];
 
         System.arraycopy(binds, 0, newBinds, 0, binds.length);
         newBinds[binds.length] = OPEN_GUI;

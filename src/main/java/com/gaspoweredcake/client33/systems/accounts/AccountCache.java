@@ -6,12 +6,12 @@
 package com.gaspoweredcake.client33.systems.accounts;
 
 import com.mojang.util.UndashedUuid;
-import com.gaspoweredcake.client33.utils.network.Client33Executor;
 import com.gaspoweredcake.client33.utils.misc.ISerializable;
 import com.gaspoweredcake.client33.utils.misc.NbtException;
+import com.gaspoweredcake.client33.utils.network.Client33Executor;
 import com.gaspoweredcake.client33.utils.render.PlayerHeadTexture;
 import com.gaspoweredcake.client33.utils.render.PlayerHeadUtils;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.CompoundTag;
 
 import static com.gaspoweredcake.client33.Client33.mc;
 
@@ -51,8 +51,8 @@ public class AccountCache implements ISerializable<AccountCache> {
     }
 
     @Override
-    public NbtCompound toTag() {
-        NbtCompound tag = new NbtCompound();
+    public CompoundTag toTag() {
+        CompoundTag tag = new CompoundTag();
 
         tag.putString("username", username);
         tag.putString("uuid", uuid);
@@ -61,7 +61,7 @@ public class AccountCache implements ISerializable<AccountCache> {
     }
 
     @Override
-    public AccountCache fromTag(NbtCompound tag) {
+    public AccountCache fromTag(CompoundTag tag) {
         if (tag.getString("username").isEmpty() || tag.getString("uuid").isEmpty()) throw new NbtException();
 
         username = tag.getString("username").get();

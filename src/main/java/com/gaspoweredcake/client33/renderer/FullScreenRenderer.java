@@ -5,8 +5,8 @@
 
 package com.gaspoweredcake.client33.renderer;
 
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.buffers.GpuBuffer;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import com.gaspoweredcake.client33.utils.PreInit;
 
 public class FullScreenRenderer {
@@ -20,11 +20,12 @@ public class FullScreenRenderer {
     @Deprecated(forRemoval = true)
     public static MeshBuilder mesh;
 
-    private FullScreenRenderer() {}
+    private FullScreenRenderer() {
+    }
 
     @PreInit
     public static void init() {
-        mesh = new MeshBuilder(Client33VertexFormats.POS2, VertexFormat.DrawMode.TRIANGLES, 4, 6);
+        mesh = new MeshBuilder(Client33VertexFormats.POS2, PrimitiveTopology.TRIANGLES, 4, 6);
 
         mesh.begin();
 

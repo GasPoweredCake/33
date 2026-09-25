@@ -7,6 +7,7 @@ package com.gaspoweredcake.client33.renderer;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.gaspoweredcake.client33.mixininterface.IRenderPipeline;
+import org.jspecify.annotations.NonNull;
 
 public class ExtendedRenderPipelineBuilder extends RenderPipeline.Builder {
     private boolean lineSmooth;
@@ -23,7 +24,7 @@ public class ExtendedRenderPipelineBuilder extends RenderPipeline.Builder {
     }
 
     @Override
-    public RenderPipeline build() {
+    public @NonNull RenderPipeline build() {
         RenderPipeline pipeline = super.build();
         ((IRenderPipeline) pipeline).client33$setLineSmooth(lineSmooth);
 

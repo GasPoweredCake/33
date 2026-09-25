@@ -13,10 +13,10 @@ import com.gaspoweredcake.client33.systems.System;
 import com.gaspoweredcake.client33.systems.Systems;
 import com.gaspoweredcake.client33.systems.modules.Module;
 import com.gaspoweredcake.client33.utils.render.color.SettingColor;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.nbt.NbtString;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,14 +59,14 @@ public class Config extends System<Config> {
 
     public final Setting<Boolean> titleScreenCredits = sgVisual.add(new BoolSetting.Builder()
         .name("title-screen-credits")
-        .description("Show 33 credits on title screen")
+        .description("Show Client33 credits on title screen")
         .defaultValue(true)
         .build()
     );
 
     public final Setting<Boolean> titleScreenSplashes = sgVisual.add(new BoolSetting.Builder()
         .name("title-screen-splashes")
-        .description("Show 33 splash texts on title screen")
+        .description("Show Client33 splash texts on title screen")
         .defaultValue(true)
         .build()
     );
@@ -75,8 +75,8 @@ public class Config extends System<Config> {
         .name("custom-window-title")
         .description("Show custom text in the window title.")
         .defaultValue(false)
-        .onModuleActivated(setting -> mc.updateWindowTitle())
-        .onChanged(value -> mc.updateWindowTitle())
+        .onModuleActivated(_ -> mc.updateTitle())
+        .onChanged(_ -> mc.updateTitle())
         .build()
     );
 
@@ -85,7 +85,7 @@ public class Config extends System<Config> {
         .description("The text it displays in the window title.")
         .visible(customWindowTitle::get)
         .defaultValue("Minecraft {mc_version} - {client33.name} {client33.version}")
-        .onChanged(value -> mc.updateWindowTitle())
+        .onChanged(_ -> mc.updateTitle())
         .build()
     );
 
@@ -165,7 +165,7 @@ public class Config extends System<Config> {
 
     public final Setting<Boolean> chatFeedback = sgChat.add(new BoolSetting.Builder()
         .name("chat-feedback")
-        .description("Sends chat feedback for client actions.")
+        .description("Sends chat feedback when client33 performs certain actions.")
         .defaultValue(true)
         .build()
     );
@@ -205,8 +205,8 @@ public class Config extends System<Config> {
     }
 
     @Override
-    public NbtCompound toTag() {
-        NbtCompound tag = new NbtCompound();
+    public CompoundTag toTag() {
+        CompoundTag tag = new CompoundTag();
 
         tag.putString("version", Client33.VERSION.toString());
         tag.put("settings", settings.toTag());
@@ -216,22 +216,22 @@ public class Config extends System<Config> {
     }
 
     @Override
-    public Config fromTag(NbtCompound tag) {
+    public Config fromTag(CompoundTag tag) {
         if (tag.contains("settings")) settings.fromTag(tag.getCompoundOrEmpty("settings"));
         if (tag.contains("dontShowAgainPrompts")) dontShowAgainPrompts = listFromTag(tag, "dontShowAgainPrompts");
 
         return this;
     }
 
-    private NbtList listToTag(List<String> list) {
-        NbtList nbt = new NbtList();
-        for (String item : list) nbt.add(NbtString.of(item));
+    private ListTag listToTag(List<String> list) {
+        ListTag nbt = new ListTag();
+        for (String item : list) nbt.add(StringTag.valueOf(item));
         return nbt;
     }
 
-    private List<String> listFromTag(NbtCompound tag, String key) {
+    private List<String> listFromTag(CompoundTag tag, String key) {
         List<String> list = new ArrayList<>();
-        for (NbtElement item : tag.getListOrEmpty(key)) list.add(item.asString().orElse(""));
+        for (Tag item : tag.getListOrEmpty(key)) list.add(item.asString().orElse(""));
         return list;
     }
 

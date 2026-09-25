@@ -21,7 +21,6 @@ import com.gaspoweredcake.client33.systems.hud.HudElement;
 import com.gaspoweredcake.client33.systems.hud.XAnchor;
 import com.gaspoweredcake.client33.systems.hud.YAnchor;
 import com.gaspoweredcake.client33.utils.misc.NbtUtils;
-import net.minecraft.client.gui.DrawContext;
 
 import static com.gaspoweredcake.client33.utils.Utils.getWindowWidth;
 
@@ -113,7 +112,7 @@ public class HudElementScreen extends WindowScreen {
         WMinus remove = bottomList.add(theme.minus()).expandCellX().right().widget();
         remove.action = () -> {
             element.remove();
-            close();
+            onClose();
         };
     }
 
@@ -126,11 +125,6 @@ public class HudElementScreen extends WindowScreen {
         }
 
         settings.tick(settingsC2, theme);
-    }
-
-    @Override
-    protected void onRenderBefore(DrawContext drawContext, float delta) {
-        HudEditorScreen.renderElements(drawContext);
     }
 
     @Override

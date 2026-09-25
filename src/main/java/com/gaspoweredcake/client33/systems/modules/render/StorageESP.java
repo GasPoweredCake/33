@@ -26,14 +26,16 @@ import com.gaspoweredcake.client33.utils.render.SimpleBlockRenderer;
 import com.gaspoweredcake.client33.utils.render.color.Color;
 import com.gaspoweredcake.client33.utils.render.color.SettingColor;
 import com.gaspoweredcake.client33.utils.render.postprocess.PostProcessShaders;
+import com.gaspoweredcake.client33.utils.world.Dir;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ChestBlock;
-import net.minecraft.block.entity.*;
-import net.minecraft.block.enums.ChestType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.level.block.entity.*;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.ChestType;
 
 import java.util.HashSet;
 import java.util.List;
@@ -191,7 +193,7 @@ public class StorageESP extends Module {
     private final Setting<SettingColor> openedColor = sgOpened.add(new ColorSetting.Builder()
         .name("opened-color")
         .description("Optional setting to change colors of opened chests, as opposed to not rendering. Disabled at zero opacity.")
-        .defaultValue(new SettingColor(154, 171, 181, 0)) // Transparent by default.
+        .defaultValue(new SettingColor(154, 171, 181, 0)) // TRANSPARENT BY DEFAULT.
         .build()
     );
 
@@ -216,12 +218,14 @@ public class StorageESP extends Module {
 
         if (!storageBlocks.get().contains(blockEntity.getType())) return;
 
-        if (blockEntity instanceof TrappedChestBlockEntity) lineColor.set(trappedChest.get()); // Must come before ChestBlockEntity as it is the superclass of TrappedChestBlockEntity
+        if (blockEntity instanceof TrappedChestBlockEntity)
+            lineColor.set(trappedChest.get()); // Must come before ChestBlockEntity as it is the superclass of TrappedChestBlockEntity
         else if (blockEntity instanceof ChestBlockEntity) lineColor.set(chest.get());
         else if (blockEntity instanceof BarrelBlockEntity) lineColor.set(barrel.get());
         else if (blockEntity instanceof ShulkerBoxBlockEntity) lineColor.set(shulker.get());
         else if (blockEntity instanceof EnderChestBlockEntity) lineColor.set(enderChest.get());
-        else if (blockEntity instanceof AbstractFurnaceBlockEntity || blockEntity instanceof BrewingStandBlockEntity || blockEntity instanceof ChiseledBookshelfBlockEntity || blockEntity instanceof CrafterBlockEntity || blockEntity instanceof DispenserBlockEntity || blockEntity instanceof DecoratedPotBlockEntity || blockEntity instanceof HopperBlockEntity) lineColor.set(other.get());
+        else if (blockEntity instanceof AbstractFurnaceBlockEntity || blockEntity instanceof BrewingStandBlockEntity || blockEntity instanceof ChiseledBookShelfBlockEntity || blockEntity instanceof CrafterBlockEntity || blockEntity instanceof DispenserBlockEntity || blockEntity instanceof DecoratedPotBlockEntity || blockEntity instanceof HopperBlockEntity)
+            lineColor.set(other.get());
         else return;
 
         render = true;
@@ -247,19 +251,19 @@ public class StorageESP extends Module {
     @EventHandler
     private void onBlockInteract(InteractBlockEvent event) {
         BlockPos pos = event.result.getBlockPos();
-        BlockEntity blockEntity = mc.world.getBlockEntity(pos);
+        BlockEntity blockEntity = mc.level.getBlockEntity(pos);
 
         if (blockEntity == null) return;
 
         interactedBlocks.add(pos);
         if (blockEntity instanceof ChestBlockEntity chestBlockEntity) {
-            BlockState state = chestBlockEntity.getCachedState();
-            ChestType chestType = state.get(ChestBlock.CHEST_TYPE);
+            BlockState state = chestBlockEntity.getBlockState();
+            ChestType chestType = state.getValue(ChestBlock.TYPE);
 
             if (chestType == ChestType.LEFT || chestType == ChestType.RIGHT) {
                 // It's part of a double chest
-                Direction facing = state.get(ChestBlock.FACING);
-                BlockPos otherPartPos = pos.offset(chestType == ChestType.LEFT ? facing.rotateYClockwise() : facing.rotateYCounterclockwise());
+                Direction facing = state.getValue(ChestBlock.FACING);
+                BlockPos otherPartPos = pos.relative(chestType == ChestType.LEFT ? facing.getClockWise() : facing.getCounterClockWise());
 
                 interactedBlocks.add(otherPartPos);
             }
@@ -273,43 +277,56 @@ public class StorageESP extends Module {
 
         for (BlockEntity blockEntity : Utils.blockEntities()) {
             if (renderMode == Mode.Box && isSecondHalfOfDoubleChest(blockEntity)) continue;
-
-            boolean interacted = interactedBlocks.contains(blockEntity.getPos());
-            if (interacted && hideOpened.get()) continue;
+            // Check if the block has been interacted with (opened)
+            boolean interacted = interactedBlocks.contains(blockEntity.getBlockPos());
+            if (interacted && hideOpened.get()) continue;  // Skip rendering if "hideOpened" is true
 
             getBlockEntityColor(blockEntity);
             if (!render) continue;
 
+            // Set the color to openedColor if its alpha is greater than 0
             if (interacted && openedColor.get().a > 0) {
+                // openedColor takes precedence.
                 lineColor.set(openedColor.get());
                 sideColor.set(openedColor.get());
                 sideColor.a = lineColor.a * fillOpacity.get() / 255;
             }
 
-            double opacity = opacityAtDistance(blockEntity.getPos());
-            if (opacity <= 0.05) continue;
+            if (render) {
+                double a = opacityAt(blockEntity.getBlockPos());
+                if (a < 0.075) continue;
 
-            if (count == 0 && renderMode == Mode.Shader) mesh.begin();
+                // Only start a mesh when there's something to render
+                if (count == 0 && mode.get() == Mode.Shader) {
+                    mesh.begin();
+                }
 
-            int prevLineA = lineColor.a;
-            int prevSideA = sideColor.a;
+                int prevLineA = lineColor.a;
+                int prevSideA = sideColor.a;
 
-            lineColor.a = (int) Math.round(prevLineA * opacity);
-            sideColor.a = (int) Math.round(prevSideA * opacity);
+                lineColor.a *= a;
+                sideColor.a *= a;
 
-            if (tracers.get()) {
-                event.renderer.line(RenderUtils.center.x, RenderUtils.center.y, RenderUtils.center.z, blockEntity.getPos().getX() + 0.5, blockEntity.getPos().getY() + 0.5, blockEntity.getPos().getZ() + 0.5, lineColor);
+                if (tracers.get()) {
+                    event.renderer.line(RenderUtils.center.x, RenderUtils.center.y, RenderUtils.center.z, blockEntity.getBlockPos().getX() + 0.5, blockEntity.getBlockPos().getY() + 0.5, blockEntity.getBlockPos().getZ() + 0.5, lineColor);
+                }
+
+                if (mode.get() == Mode.Box) {
+                    renderBox(event, blockEntity);
+                }
+
+                if (mode.get() == Mode.Shader) {
+                    renderShader(event, blockEntity);
+                }
+
+                lineColor.a = prevLineA;
+                sideColor.a = prevSideA;
+
+                count++;
             }
-
-            if (renderMode == Mode.Box) renderBox(event, blockEntity);
-            else renderShader(event, blockEntity);
-
-            lineColor.a = prevLineA;
-            sideColor.a = prevSideA;
-            count++;
         }
 
-        if (renderMode == Mode.Shader && count > 0) {
+        if (mode.get() == Mode.Shader && count > 0) {
             MeshRenderer.begin()
                 .attachments(PostProcessShaders.STORAGE_OUTLINE.framebuffer)
                 .clearColor(Color.CLEAR)
@@ -321,56 +338,52 @@ public class StorageESP extends Module {
         }
     }
 
-    private double opacityAtDistance(BlockPos pos) {
+
+    private double opacityAt(BlockPos pos) {
         double distanceSquared = PlayerUtils.squaredDistanceToCamera(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
         int limit = maxDistance.get();
         if (limit > 0 && distanceSquared >= (double) limit * limit) return 0;
 
         double distance = Math.sqrt(distanceSquared);
         double opacity = 1;
-
         double nearFade = fadeDistance.get();
         if (nearFade > 0) {
-            double t = MathHelper.clamp(distance / nearFade, 0, 1);
+            double t = Mth.clamp(distance / nearFade, 0, 1);
             opacity *= t * t * (3 - 2 * t);
         }
 
         int farFade = farFadeDistance.get();
         if (limit > 0 && farFade > 0) {
-            double t = MathHelper.clamp((limit - distance) / Math.min(farFade, limit), 0, 1);
+            double t = Mth.clamp((limit - distance) / Math.min(farFade, limit), 0, 1);
             opacity *= t * t * (3 - 2 * t);
         }
-
         return opacity;
     }
 
     private boolean isSecondHalfOfDoubleChest(BlockEntity blockEntity) {
         if (!(blockEntity instanceof ChestBlockEntity)) return false;
-
-        BlockState state = blockEntity.getCachedState();
-        if (!(state.getBlock() instanceof ChestBlock) || state.get(ChestBlock.CHEST_TYPE) != ChestType.RIGHT) return false;
-
-        Direction facing = state.get(ChestBlock.FACING);
-        BlockEntity otherHalf = mc.world.getBlockEntity(blockEntity.getPos().offset(facing.rotateYCounterclockwise()));
+        BlockState state = blockEntity.getBlockState();
+        if (!(state.getBlock() instanceof ChestBlock) || state.getValue(ChestBlock.TYPE) != ChestType.RIGHT) return false;
+        Direction facing = state.getValue(ChestBlock.FACING);
+        BlockEntity otherHalf = mc.level.getBlockEntity(blockEntity.getBlockPos().relative(facing.getCounterClockWise()));
         return otherHalf instanceof ChestBlockEntity && otherHalf.getType() == blockEntity.getType();
     }
 
-
     private void renderBox(Render3DEvent event, BlockEntity blockEntity) {
-        double x1 = blockEntity.getPos().getX();
-        double y1 = blockEntity.getPos().getY();
-        double z1 = blockEntity.getPos().getZ();
-
-        double x2 = blockEntity.getPos().getX() + 1;
-        double y2 = blockEntity.getPos().getY() + 1;
-        double z2 = blockEntity.getPos().getZ() + 1;
+        BlockPos pos = blockEntity.getBlockPos();
+        double x1 = pos.getX();
+        double y1 = pos.getY();
+        double z1 = pos.getZ();
+        double x2 = x1 + 1;
+        double y2 = y1 + 1;
+        double z2 = z1 + 1;
 
         if (blockEntity instanceof ChestBlockEntity) {
-            BlockState state = mc.world.getBlockState(blockEntity.getPos());
-            if (state.getBlock() instanceof ChestBlock && state.get(ChestBlock.CHEST_TYPE) == ChestType.LEFT) {
-                Direction facing = state.get(ChestBlock.FACING);
-                BlockPos otherPos = blockEntity.getPos().offset(facing.rotateYClockwise());
-                BlockEntity otherHalf = mc.world.getBlockEntity(otherPos);
+            BlockState state = mc.level.getBlockState(pos);
+            if (state.getBlock() instanceof ChestBlock && state.getValue(ChestBlock.TYPE) == ChestType.LEFT) {
+                Direction facing = state.getValue(ChestBlock.FACING);
+                BlockPos otherPos = pos.relative(facing.getClockWise());
+                BlockEntity otherHalf = mc.level.getBlockEntity(otherPos);
                 if (otherHalf instanceof ChestBlockEntity && otherHalf.getType() == blockEntity.getType()) {
                     x1 = Math.min(x1, otherPos.getX());
                     z1 = Math.min(z1, otherPos.getZ());
@@ -381,12 +394,12 @@ public class StorageESP extends Module {
         }
 
         if (blockEntity instanceof ChestBlockEntity || blockEntity instanceof EnderChestBlockEntity) {
-            double a = 1.0 / 16.0;
-            x1 += a;
-            z1 += a;
-            x2 -= a;
-            y2 -= a * 2;
-            z2 -= a;
+            double inset = 1.0 / 16.0;
+            x1 += inset;
+            z1 += inset;
+            x2 -= inset;
+            y2 -= inset * 2;
+            z2 -= inset;
         }
 
         if (boxStyle.get() == BoxStyle.Full) {
@@ -401,7 +414,6 @@ public class StorageESP extends Module {
         double dx = Math.min(0.25, (x2 - x1) * 0.28);
         double dy = Math.min(0.25, (y2 - y1) * 0.28);
         double dz = Math.min(0.25, (z2 - z1) * 0.28);
-
         for (int ix = 0; ix < 2; ix++) {
             double x = ix == 0 ? x1 : x2;
             double nextX = x + (ix == 0 ? dx : -dx);

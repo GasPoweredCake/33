@@ -21,10 +21,10 @@ public class Client33Executor {
     public static void init() {
         AtomicInteger threadNumber = new AtomicInteger(1);
 
-        executor = Executors.newCachedThreadPool((task) -> {
+        executor = Executors.newCachedThreadPool(task -> {
             Thread thread = new Thread(task);
             thread.setDaemon(true);
-            thread.setName("33-Executor-" + threadNumber.getAndIncrement());
+            thread.setName("Client33-Executor-" + threadNumber.getAndIncrement());
             return thread;
         });
     }

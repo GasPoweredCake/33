@@ -8,7 +8,8 @@ package com.gaspoweredcake.client33.systems.modules.movement;
 import com.gaspoweredcake.client33.settings.*;
 import com.gaspoweredcake.client33.systems.modules.Categories;
 import com.gaspoweredcake.client33.systems.modules.Module;
-import net.minecraft.block.Block;
+import com.gaspoweredcake.client33.utils.misc.ListMode;
+import net.minecraft.world.level.block.Block;
 
 import java.util.List;
 
@@ -49,8 +50,4 @@ public class Slippy extends Module {
         super(Categories.Movement, "slippy", "Changes the base friction level of blocks.");
     }
 
-    public enum ListMode {
-        Whitelist,
-        Blacklist
-    }
 }

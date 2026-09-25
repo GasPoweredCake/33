@@ -11,7 +11,7 @@ import com.gaspoweredcake.client33.gui.themes.client33.Client33Widget;
 import com.gaspoweredcake.client33.gui.utils.AlignmentX;
 import com.gaspoweredcake.client33.gui.widgets.pressable.WPressable;
 import com.gaspoweredcake.client33.systems.modules.Module;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 
 import static com.gaspoweredcake.client33.Client33.mc;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
@@ -59,7 +59,7 @@ public class WClient33Module extends WPressable implements Client33Widget {
     @Override
     protected void onPressed(int button) {
         if (button == GLFW_MOUSE_BUTTON_LEFT) module.toggle();
-        else if (button == GLFW_MOUSE_BUTTON_RIGHT) mc.setScreen(theme.moduleScreen(module));
+        else if (button == GLFW_MOUSE_BUTTON_RIGHT) mc.gui.setScreen(theme.moduleScreen(module));
     }
 
     @Override
@@ -68,10 +68,10 @@ public class WClient33Module extends WPressable implements Client33Widget {
         double pad = pad();
 
         animationProgress1 += delta * 4 * ((module.isActive() || mouseOver) ? 1 : -1);
-        animationProgress1 = MathHelper.clamp(animationProgress1, 0, 1);
+        animationProgress1 = Mth.clamp(animationProgress1, 0, 1);
 
         animationProgress2 += delta * 6 * (module.isActive() ? 1 : -1);
-        animationProgress2 = MathHelper.clamp(animationProgress2, 0, 1);
+        animationProgress2 = Mth.clamp(animationProgress2, 0, 1);
 
         if (animationProgress1 > 0) {
             renderer.quad(x, y, width * animationProgress1, height, theme.moduleBackground.get());

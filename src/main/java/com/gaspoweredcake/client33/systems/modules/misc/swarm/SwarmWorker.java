@@ -8,7 +8,7 @@ package com.gaspoweredcake.client33.systems.modules.misc.swarm;
 import com.gaspoweredcake.client33.commands.Commands;
 import com.gaspoweredcake.client33.pathing.PathManagers;
 import com.gaspoweredcake.client33.utils.player.ChatUtils;
-import net.minecraft.block.Block;
+import net.minecraft.world.level.block.Block;
 
 import java.io.DataInputStream;
 import java.io.IOException;

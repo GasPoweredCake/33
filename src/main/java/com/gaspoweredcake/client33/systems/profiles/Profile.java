@@ -13,8 +13,8 @@ import com.gaspoweredcake.client33.systems.modules.Modules;
 import com.gaspoweredcake.client33.systems.waypoints.Waypoints;
 import com.gaspoweredcake.client33.utils.Utils;
 import com.gaspoweredcake.client33.utils.misc.ISerializable;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -31,7 +31,7 @@ public class Profile implements ISerializable<Profile> {
     public Setting<String> name = sgGeneral.add(new StringSetting.Builder()
         .name("name")
         .description("The name of the profile.")
-        .filter(Utils::nameFilter)
+        .filter(Utils::fileNameFilter)
         .build()
     );
 
@@ -70,14 +70,15 @@ public class Profile implements ISerializable<Profile> {
         .build()
     );
 
-    public Profile() {}
-    public Profile(NbtElement tag) {
-        fromTag((NbtCompound) tag);
+    public Profile() {
+    }
+
+    public Profile(Tag tag) {
+        fromTag((CompoundTag) tag);
     }
 
     public void load() {
-        File folder = getSafeFile();
-        if (folder == null) return;
+        File folder = getFile();
 
         if (hud.get()) Hud.get().load(folder);
         if (macros.get()) Macros.get().load(folder);
@@ -86,8 +87,7 @@ public class Profile implements ISerializable<Profile> {
     }
 
     public void save() {
-        File folder = getSafeFile();
-        if (folder == null) return;
+        File folder = getFile();
 
         if (hud.get()) Hud.get().save(folder);
         if (macros.get()) Macros.get().save(folder);
@@ -97,8 +97,7 @@ public class Profile implements ISerializable<Profile> {
 
     public void delete() {
         try {
-            File folder = getSafeFile();
-            if (folder != null) FileUtils.deleteDirectory(folder);
+            FileUtils.deleteDirectory(getFile());
         } catch (IOException e) {
             Client33.LOG.error("Error deleting profile {}", name.get(), e);
         }
@@ -108,23 +107,9 @@ public class Profile implements ISerializable<Profile> {
         return new File(Profiles.FOLDER, name.get());
     }
 
-    public File getSafeFile() {
-        try {
-            File folder = getFile().getCanonicalFile();
-            File profilesFolder = Profiles.FOLDER.getCanonicalFile();
-
-            if (name.get().isEmpty() || !profilesFolder.equals(folder.getParentFile())) return null;
-
-            return folder;
-        } catch (IOException e) {
-            Client33.LOG.error("Error resolving profile {}", name.get(), e);
-            return null;
-        }
-    }
-
     @Override
-    public NbtCompound toTag() {
-        NbtCompound tag = new NbtCompound();
+    public CompoundTag toTag() {
+        CompoundTag tag = new CompoundTag();
 
         tag.put("settings", settings.toTag());
 
@@ -132,7 +117,7 @@ public class Profile implements ISerializable<Profile> {
     }
 
     @Override
-    public Profile fromTag(NbtCompound tag) {
+    public Profile fromTag(CompoundTag tag) {
         if (tag.contains("settings")) {
             settings.fromTag(tag.getCompoundOrEmpty("settings"));
         }

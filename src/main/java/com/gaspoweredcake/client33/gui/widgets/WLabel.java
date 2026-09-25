@@ -7,7 +7,7 @@ package com.gaspoweredcake.client33.gui.widgets;
 
 import com.gaspoweredcake.client33.gui.widgets.pressable.WPressable;
 import com.gaspoweredcake.client33.utils.render.color.Color;
-import net.minecraft.client.gui.Click;
+import net.minecraft.client.input.MouseButtonEvent;
 
 public abstract class WLabel extends WPressable {
     public Color color;
@@ -27,13 +27,13 @@ public abstract class WLabel extends WPressable {
     }
 
     @Override
-    public boolean onMouseClicked(Click click, boolean doubled) {
+    public boolean onMouseClicked(MouseButtonEvent click, boolean doubled) {
         if (action != null) return super.onMouseClicked(click, doubled);
         return false;
     }
 
     @Override
-    public boolean onMouseReleased(Click click) {
+    public boolean onMouseReleased(MouseButtonEvent click) {
         if (action != null) return super.onMouseReleased(click);
         return false;
     }

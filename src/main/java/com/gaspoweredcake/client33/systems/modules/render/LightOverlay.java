@@ -17,7 +17,7 @@ import com.gaspoweredcake.client33.utils.render.color.SettingColor;
 import com.gaspoweredcake.client33.utils.world.BlockIterator;
 import com.gaspoweredcake.client33.utils.world.BlockUtils;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,14 +65,14 @@ public class LightOverlay extends Module {
     private final Setting<SettingColor> color = sgColors.add(new ColorSetting.Builder()
         .name("color")
         .description("Color of places where mobs can currently spawn.")
-        .defaultValue(new SettingColor(255, 112, 135))
+        .defaultValue(new SettingColor(225, 25, 25))
         .build()
     );
 
     private final Setting<SettingColor> potentialColor = sgColors.add(new ColorSetting.Builder()
         .name("potential-color")
         .description("Color of places where mobs can potentially spawn (eg at night).")
-        .defaultValue(new SettingColor(255, 195, 110))
+        .defaultValue(new SettingColor(225, 225, 25))
         .build()
     );
 

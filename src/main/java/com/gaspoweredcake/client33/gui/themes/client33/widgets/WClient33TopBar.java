@@ -24,7 +24,7 @@ public class WClient33TopBar extends WTopBar implements Client33Widget {
                 protected void onRender(GuiRenderer renderer, double mouseX, double mouseY, double delta) {
                     super.onRender(renderer, mouseX, mouseY, delta);
 
-                    boolean active = mc.currentScreen instanceof TabScreen screen && screen.tab == tab;
+                    boolean active = mc.gui.screen() instanceof TabScreen screen && screen.tab == tab;
                     double line = WClient33TopBar.this.theme().scale(active ? 2 : 1);
                     Color color = active ? WClient33TopBar.this.theme().accentColor.get() : WClient33TopBar.this.theme().outlineColor.get(false, mouseOver);
                     renderer.quad(x, y + height - line, width, line, color);

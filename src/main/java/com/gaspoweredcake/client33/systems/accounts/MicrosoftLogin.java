@@ -54,7 +54,7 @@ public class MicrosoftLogin {
                     .login(DeviceCodeMsaAuthService::new, (Consumer<MsaDeviceCode>) deviceCode -> {
                         String urlString = deviceCode.getDirectVerificationUri();
                         urlFuture.complete(urlString);
-                        Util.getOperatingSystem().open(urlString);
+                        Util.getPlatform().openUri(urlString);
                     });
 
                 MsaToken msaToken = authManager.getMsaToken().getUpToDate();
@@ -74,7 +74,6 @@ public class MicrosoftLogin {
                 Client33.LOG.error("Error logging into Microsoft account", e);
                 callback.accept(null);
             }
-
         }));
 
         try {

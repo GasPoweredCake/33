@@ -5,7 +5,7 @@
 
 package com.gaspoweredcake.client33.utils.notebot.song;
 
-import net.minecraft.block.enums.NoteBlockInstrument;
+import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 
 import java.util.Objects;
 

@@ -22,7 +22,7 @@ public class AntiVoid extends Module {
         .name("mode")
         .description("The method to prevent you from falling into the void.")
         .defaultValue(Mode.Jump)
-        .onChanged(a -> onActivate())
+        .onChanged(_ -> onActivate())
         .build()
     );
 
@@ -47,7 +47,7 @@ public class AntiVoid extends Module {
 
     @EventHandler
     private void onPreTick(TickEvent.Pre event) {
-        int minY = mc.world.getBottomY();
+        int minY = mc.level.getMinY();
 
         if (mc.player.getY() > minY || mc.player.getY() < minY - 15) {
             if (hasRun && mode.get() == Mode.Flight) {
@@ -62,7 +62,7 @@ public class AntiVoid extends Module {
                 Modules.get().get(Flight.class).enable();
                 hasRun = true;
             }
-            case Jump -> mc.player.jump();
+            case Jump -> mc.player.jumpFromGround();
         }
     }
 

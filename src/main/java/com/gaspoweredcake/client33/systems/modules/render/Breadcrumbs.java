@@ -13,7 +13,7 @@ import com.gaspoweredcake.client33.systems.modules.Module;
 import com.gaspoweredcake.client33.utils.misc.Pool;
 import com.gaspoweredcake.client33.utils.render.color.SettingColor;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.level.dimension.DimensionType;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
@@ -24,7 +24,7 @@ public class Breadcrumbs extends Module {
     private final Setting<SettingColor> color = sgGeneral.add(new ColorSetting.Builder()
         .name("color")
         .description("The color of the Breadcrumbs trail.")
-        .defaultValue(new SettingColor(255, 112, 135))
+        .defaultValue(new SettingColor(225, 25, 25))
         .build()
     );
 
@@ -62,7 +62,7 @@ public class Breadcrumbs extends Module {
         section = sectionPool.get();
         section.set1();
 
-        lastDimension = mc.world.getDimension();
+        lastDimension = mc.level.dimensionType();
     }
 
     @Override
@@ -73,9 +73,9 @@ public class Breadcrumbs extends Module {
 
     @EventHandler
     private void onTick(TickEvent.Post event) {
-        if (!mc.getNetworkHandler().isLoaded()) return;
+        if (!mc.getConnection().hasClientLoaded()) return;
 
-        if (lastDimension != mc.world.getDimension()) {
+        if (lastDimension != mc.level.dimensionType()) {
             sectionPool.freeAll(sections);
             sections.clear();
         }
@@ -93,7 +93,7 @@ public class Breadcrumbs extends Module {
             section.set1();
         }
 
-        lastDimension = mc.world.getDimension();
+        lastDimension = mc.level.dimensionType();
     }
 
     @EventHandler

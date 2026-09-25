@@ -6,7 +6,7 @@
 package com.gaspoweredcake.client33.gui.widgets;
 
 import com.gaspoweredcake.client33.gui.renderer.GuiRenderer;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public class WItem extends WWidget {
     protected ItemStack itemStack;

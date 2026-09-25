@@ -10,15 +10,16 @@ import com.gaspoweredcake.client33.gui.screens.settings.base.CollectionListSetti
 import com.gaspoweredcake.client33.gui.widgets.WWidget;
 import com.gaspoweredcake.client33.settings.ItemListSetting;
 import com.gaspoweredcake.client33.utils.misc.Names;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.registry.Registries;
+import com.gaspoweredcake.client33.utils.render.DisplayItemUtils;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 
 import java.util.function.Predicate;
 
 public class ItemListSettingScreen extends CollectionListSettingScreen<Item> {
     public ItemListSettingScreen(GuiTheme theme, ItemListSetting setting) {
-        super(theme, "Select Items", setting, setting.get(), Registries.ITEM);
+        super(theme, "Select Items", setting, setting.get(), BuiltInRegistries.ITEM);
     }
 
     @Override
@@ -31,14 +32,14 @@ public class ItemListSettingScreen extends CollectionListSettingScreen<Item> {
 
     @Override
     protected WWidget getValueWidget(Item value) {
-        return theme.itemWithLabel(value.getDefaultStack());
+        return theme.itemWithLabel(DisplayItemUtils.toStack(value));
     }
 
     @Override
     protected String[] getValueNames(Item value) {
         return new String[]{
             Names.get(value),
-            Registries.ITEM.getId(value).toString()
+            BuiltInRegistries.ITEM.getKey(value).toString()
         };
     }
 }

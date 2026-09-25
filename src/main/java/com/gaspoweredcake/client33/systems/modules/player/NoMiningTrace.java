@@ -11,9 +11,9 @@ import com.gaspoweredcake.client33.settings.Setting;
 import com.gaspoweredcake.client33.settings.SettingGroup;
 import com.gaspoweredcake.client33.systems.modules.Categories;
 import com.gaspoweredcake.client33.systems.modules.Module;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.registry.tag.ItemTags;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 
 import java.util.Set;
 
@@ -41,7 +41,7 @@ public class NoMiningTrace extends Module {
     public boolean canWork(Entity entity) {
         if (!isActive()) return false;
 
-        return (!onlyWhenHoldingPickaxe.get() || mc.player.getMainHandStack().isIn(ItemTags.PICKAXES) || mc.player.getOffHandStack().isIn(ItemTags.PICKAXES)) &&
+        return (!onlyWhenHoldingPickaxe.get() || mc.player.getMainHandItem().is(ItemTags.PICKAXES) || mc.player.getOffhandItem().is(ItemTags.PICKAXES)) &&
             (entity == null || !entities.get().contains(entity.getType()));
     }
 }

@@ -12,7 +12,7 @@ import com.gaspoweredcake.client33.systems.hud.elements.TextHud;
 import com.gaspoweredcake.client33.systems.modules.Category;
 import com.gaspoweredcake.client33.systems.modules.Module;
 import com.gaspoweredcake.client33.systems.modules.Modules;
-import net.minecraft.util.crash.CrashReport;
+import net.minecraft.CrashReport;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -22,12 +22,12 @@ import java.util.List;
 
 @Mixin(CrashReport.class)
 public abstract class CrashReportMixin {
-    @Inject(method = "addDetails", at = @At("TAIL"))
-    private void onAddDetails(StringBuilder sb, CallbackInfo info) {
-        sb.append("\n\n-- 33 --\n\n");
-        sb.append("Version: ").append(Client33.VERSION).append("\n");
+    @Inject(method = "getDetails(Ljava/lang/StringBuilder;)V", at = @At("TAIL"))
+    private void onAddDetails(StringBuilder builder, CallbackInfo ci) {
+        builder.append("\n\n-- 33 --\n\n");
+        builder.append("Version: ").append(Client33.VERSION).append("\n");
         if (!Client33.BUILD_NUMBER.isEmpty()) {
-            sb.append("Build: ").append(Client33.BUILD_NUMBER).append("\n");
+            builder.append("Build: ").append(Client33.BUILD_NUMBER).append("\n");
         }
 
         if (Modules.get() != null) {
@@ -41,17 +41,17 @@ public abstract class CrashReportMixin {
 
                     if (!modulesActive) {
                         modulesActive = true;
-                        sb.append("\n[[ Active Modules ]]\n");
+                        builder.append("\n[[ Active Modules ]]\n");
                     }
 
                     if (!categoryActive) {
                         categoryActive = true;
-                        sb.append("\n[")
-                          .append(category)
-                          .append("]:\n");
+                        builder.append("\n[")
+                            .append(category)
+                            .append("]:\n");
                     }
 
-                    sb.append(module.name).append("\n");
+                    builder.append(module.name).append("\n");
                 }
 
             }
@@ -65,19 +65,19 @@ public abstract class CrashReportMixin {
 
                 if (!hudActive) {
                     hudActive = true;
-                    sb.append("\n[[ Active Hud Elements ]]\n");
+                    builder.append("\n[[ Active Hud Elements ]]\n");
                 }
 
-                if (!(element instanceof TextHud textHud)) sb.append(element.info.name).append("\n");
+                if (!(element instanceof TextHud textHud)) builder.append(element.info.name).append("\n");
                 else {
-                    sb.append("Text\n{")
-                      .append(textHud.text.get())
-                      .append("}\n");
+                    builder.append("Text\n{")
+                        .append(textHud.text.get())
+                        .append("}\n");
                     if (textHud.shown.get() != TextHud.Shown.Always) {
-                        sb.append("(")
-                          .append(textHud.shown.get())
-                          .append(textHud.condition.get())
-                          .append(")\n");
+                        builder.append("(")
+                            .append(textHud.shown.get())
+                            .append(textHud.condition.get())
+                            .append(")\n");
                     }
                 }
             }

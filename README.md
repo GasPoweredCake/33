@@ -3,15 +3,15 @@
 </p>
 
 <h1 align="center">33</h1>
-<p align="center">A Minecraft Fabric utility client for 1.21.11.</p>
+<p align="center">A Minecraft Fabric utility client for 26.2.</p>
 
 ## Build
 
-Use Java 21 and run `./gradlew build`. The JAR is written to `build/libs/`.
+Use Java 25 and run `./gradlew build`. The JAR is written to `build/libs/`.
 
 ## Install
 
-Install Fabric Loader for Minecraft 1.21.11, then put the built JAR in your Minecraft `mods` folder.
+Install Fabric Loader for Minecraft 26.2, then put the built JAR in your Minecraft `mods` folder.
 
 ## Contribute
 
